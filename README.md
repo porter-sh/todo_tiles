@@ -1,3 +1,3 @@
 # todo_tiles
 
-A new Flutter project.
+A Mobile App for planning and tracking tasks.
