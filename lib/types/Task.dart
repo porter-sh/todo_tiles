@@ -14,10 +14,30 @@ class Task {
   /// The category of the task.
   final Category? category;
 
+  /// When the task was created.
+  DateTime creationDate = DateTime.now();
+
   /// Creates a new [Task] with the given [name], [category], and [dueDate].
-  const Task({
+  Task({
     required this.name,
     this.description,
     this.category,
   });
+
+  /// Overrides the equality operator so that two tasks are equal if they have
+  /// the same unique identifier. This way, even tasks with all the same details
+  /// are consedered to be different tasks.
+  @override
+  bool operator ==(Object other) {
+    if (other is Task) {
+      return hashCode == other.hashCode;
+    } else {
+      return false;
+    }
+  }
+
+  /// Overrides the hashcode getter so that no two tasks would reasonably have
+  /// the same hashcode.
+  @override
+  int get hashCode => (name + creationDate.toString()).hashCode;
 }
