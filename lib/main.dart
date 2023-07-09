@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'PageSelector.dart';
+import 'page_selector.dart';
+import 'task_data.dart';
 
 void main() {
   runApp(const MainApp());
@@ -11,15 +13,18 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      // Material3 Theme
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.blue,
+    return ChangeNotifierProvider(
+      create: (context) => TaskData(),
+      child: MaterialApp(
+        // Material3 Theme
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.blue,
+          ),
+          useMaterial3: true,
         ),
-        useMaterial3: true,
+        home: const PageSelector(),
       ),
-      home: const PageSelector(),
     );
   }
 }

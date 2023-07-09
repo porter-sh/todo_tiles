@@ -1,4 +1,4 @@
-import 'Category.dart';
+import 'category.dart';
 
 /// This file contains the definition of the Task type.
 
