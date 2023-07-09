@@ -3,10 +3,16 @@
 
 import 'package:flutter/material.dart';
 
+import 'pages/friends.dart';
+import 'pages/history.dart';
+import 'pages/home.dart';
+import 'pages/profile.dart';
+import 'pages/settings.dart';
+
 /// Public class [PageSelector] is a [StatefulWidget] that creates the layout of the
 /// app with the private class [_PageSelectorState].
 class PageSelector extends StatefulWidget {
-  const PageSelector({Key? key}) : super(key: key);
+  const PageSelector({super.key});
 
   @override
   State<PageSelector> createState() => _PageSelectorState();
@@ -52,8 +58,28 @@ class _PageSelectorState extends State<PageSelector> {
   /// Returns the widget that displays the navigation, and the correct page.
   @override
   Widget build(BuildContext context) {
+    Widget page;
+    switch (_selectedIndex) {
+      case 0:
+        page = const HomePage();
+        break;
+      case 1:
+        page = const HistoryPage();
+        break;
+      case 2:
+        page = const FriendsPage();
+        break;
+      case 3:
+        page = const SettingsPage();
+        break;
+      case 4:
+        page = const ProfilePage();
+        break;
+      default:
+        page = const HomePage();
+    }
     return Scaffold(
-      body: const Placeholder(),
+      body: SafeArea(child: page),
       bottomNavigationBar: BottomNavigationBar(
         items: _bottomNavBarItems,
         currentIndex: _selectedIndex,
