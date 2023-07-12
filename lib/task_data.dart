@@ -13,8 +13,12 @@ class TaskData with ChangeNotifier {
   /// The list of user-created task categories.
   final List<Category> _categories = [];
 
-  /// Returns the list of categories.
-  List<Category> get categories => _categories;
+  /// Returns the list of categories, with the default categories added.
+  List<Category> get categories => [
+        Category.all,
+        Category.none,
+        ..._categories,
+      ];
 
   /// Returns the number of categories stored.
   int get numCategories => _categories.length;
