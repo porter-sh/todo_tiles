@@ -36,7 +36,8 @@ class _HomePageState extends State<HomePage> {
       children: [
         // Banner at the top for selecting filters by category and due date.
         Container(
-          color: Colors.blue,
+          color: Theme.of(context).colorScheme.primary,
+          padding: const EdgeInsets.all(10),
           child: Row(
             children: [
               // Category filter.
@@ -49,6 +50,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 items: taskData.categories,
               ),
+              const SizedBox(width: 10),
               // Due date filter.
               FilterDropdown<TimeHorizon>(
                 value: timeHorizonView,

@@ -22,6 +22,14 @@ class MainApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           useMaterial3: true,
+          buttonTheme: ButtonThemeData(
+            colorScheme: ColorScheme.fromSwatch(
+              primarySwatch: Colors.blue,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
         ),
         home: const PageSelector(),
       ),

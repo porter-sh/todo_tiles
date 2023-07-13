@@ -29,7 +29,14 @@ class FilterDropdown<T extends FilterMenuItem<T>> extends StatelessWidget {
   /// Returns the widget that displays the dropdown.
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      decoration: BoxDecoration(
+        color: Theme.of(context).buttonTheme.colorScheme?.background,
+        borderRadius:
+            (Theme.of(context).buttonTheme.shape as RoundedRectangleBorder)
+                .borderRadius,
+      ),
       child: DropdownButton<T>(
         value: value,
         onChanged: onChanged,
