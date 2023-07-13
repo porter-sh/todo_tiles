@@ -14,6 +14,9 @@ class Task {
   /// The category of the task.
   final Category? category;
 
+  /// The due date of the task.
+  final DateTime? dueDate;
+
   /// When the task was created.
   DateTime creationDate = DateTime.now();
 
@@ -22,6 +25,7 @@ class Task {
     required this.name,
     this.description,
     this.category,
+    this.dueDate,
   });
 
   /// Overrides the equality operator so that two tasks are equal if they have

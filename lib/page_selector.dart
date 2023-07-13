@@ -2,12 +2,15 @@
 /// bottom navigation bar and a floating action button to add new tasks.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'pages/friends.dart';
 import 'pages/history.dart';
 import 'pages/home.dart';
 import 'pages/profile.dart';
 import 'pages/settings.dart';
+import 'task_data.dart';
+import 'types/task.dart';
 
 /// Public class [PageSelector] is a [StatefulWidget] that creates the layout of the
 /// app with the private class [_PageSelectorState].
@@ -58,6 +61,8 @@ class _PageSelectorState extends State<PageSelector> {
   /// Returns the widget that displays the navigation, and the correct page.
   @override
   Widget build(BuildContext context) {
+    var taskData = context.watch<TaskData>();
+
     Widget page;
     switch (_selectedIndex) {
       case 0:
@@ -85,6 +90,15 @@ class _PageSelectorState extends State<PageSelector> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
+      // Floating action button to add new tasks only on the Home page.
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
+              onPressed: () {
+                taskData.addTask(Task(name: 'Task #${taskData.numTasks + 1}'));
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

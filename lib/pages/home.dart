@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 
 import '../task_data.dart';
 import '../types/category.dart';
-import '../types/task.dart';
 import '../types/time_horizon.dart';
 import '../util/filter_dropdown.dart';
 
@@ -64,19 +63,27 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("Home Page"),
-              Text("There are ${taskData.numTasks} tasks."),
-              FloatingActionButton(
-                onPressed: () {
-                  taskData.addTask(Task(name: "New Task"));
-                },
-                child: const Icon(Icons.add),
-              ),
-            ],
+        // Scrollable grid of tasks.
+
+        Expanded(
+          child: GridView.builder(
+            physics: const ScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+            ),
+            itemCount: taskData.numTasks,
+            itemBuilder: (context, index) {
+              var task = taskData.tasks[index];
+              return Card(
+                child: Column(
+                  children: [
+                    Text(task.name),
+                    Text(task.creationDate.toString()),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ],
