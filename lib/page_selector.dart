@@ -2,15 +2,14 @@
 /// bottom navigation bar and a floating action button to add new tasks.
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 import 'pages/friends.dart';
 import 'pages/history.dart';
 import 'pages/home.dart';
 import 'pages/profile.dart';
 import 'pages/settings.dart';
-import 'task_data.dart';
-import 'types/task.dart';
+import 'prebuilt/home_expandable_fab.dart';
 
 /// Public class [PageSelector] is a [StatefulWidget] that creates the layout of the
 /// app with the private class [_PageSelectorState].
@@ -27,28 +26,13 @@ class _PageSelectorState extends State<PageSelector> {
   // The index of the currently selected tab.
   int _selectedIndex = 0;
 
-  // The list of tabs in the bottom navigation bar.
-  static const List<BottomNavigationBarItem> _bottomNavBarItems = [
-    BottomNavigationBarItem(
-      icon: Icon(Icons.home),
-      label: 'Home',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.history),
-      label: 'History',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.people),
-      label: 'Friends',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.settings),
-      label: 'Settings',
-    ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.person),
-      label: 'Profile',
-    ),
+  // List of the details of the tabs in the bottom navigation bar.
+  static final _bottomNavBarItems = [
+    [const Icon(Icons.home), 'Home'],
+    [const Icon(Icons.history), 'History'],
+    [const Icon(Icons.people), 'Friends'],
+    [const Icon(Icons.settings), 'Settings'],
+    [const Icon(Icons.person), 'Profile'],
   ];
 
   /// Called when the user taps on a tab in the bottom navigation bar.
@@ -61,8 +45,6 @@ class _PageSelectorState extends State<PageSelector> {
   /// Returns the widget that displays the navigation, and the correct page.
   @override
   Widget build(BuildContext context) {
-    var taskData = context.watch<TaskData>();
-
     Widget page;
     switch (_selectedIndex) {
       case 0:
@@ -86,19 +68,22 @@ class _PageSelectorState extends State<PageSelector> {
     return Scaffold(
       body: SafeArea(child: page),
       bottomNavigationBar: BottomNavigationBar(
-        items: _bottomNavBarItems,
+        items: _bottomNavBarItems.map((item) {
+          return BottomNavigationBarItem(
+            icon: item[0] as Icon,
+            label: item[1] as String,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          );
+        }).toList(),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        fixedColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        unselectedItemColor: Theme.of(context).colorScheme.onPrimaryContainer,
       ),
       // Floating action button to add new tasks only on the Home page.
-      floatingActionButton: _selectedIndex == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                taskData.addTask(Task(name: 'Task #${taskData.numTasks + 1}'));
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton:
+          _selectedIndex == 0 ? const HomeExpandableFab() : null,
     );
   }
 }

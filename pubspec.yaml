@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  flutter_expandable_fab: ^1.8.1
   provider: ^6.0.0
 
 dev_dependencies:

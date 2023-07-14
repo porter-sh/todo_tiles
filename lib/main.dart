@@ -18,10 +18,10 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
         // Material3 Theme
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.blue,
-          ),
           useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+          ),
           buttonTheme: ButtonThemeData(
             colorScheme: ColorScheme.fromSwatch(
               primarySwatch: Colors.blue,
