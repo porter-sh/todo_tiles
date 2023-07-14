@@ -35,19 +35,19 @@ class _HomePageState extends State<HomePage> {
       children: [
         // Banner at the top for selecting filters by category and due date.
         Container(
-          color: Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).colorScheme.primaryContainer,
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
               // Category filter.
               FilterDropdown<Category>(
                 value: categoryView,
+                items: taskData.categories,
                 onChanged: (Category? newValue) {
                   setState(() {
                     categoryView = newValue!;
                   });
                 },
-                items: taskData.categories,
               ),
               const SizedBox(width: 10),
               // Due date filter.
@@ -64,7 +64,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         // Scrollable grid of tasks.
-
         Expanded(
           child: GridView.builder(
             physics: const ScrollPhysics(),

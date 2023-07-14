@@ -32,7 +32,7 @@ class FilterDropdown<T extends FilterMenuItem<T>> extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).buttonTheme.colorScheme?.background,
+        color: Theme.of(context).buttonTheme.colorScheme?.surface,
         borderRadius:
             (Theme.of(context).buttonTheme.shape as RoundedRectangleBorder)
                 .borderRadius,
