@@ -20,6 +20,14 @@ class Task {
   /// When the task was created.
   DateTime creationDate = DateTime.now();
 
+  /// Whether the task has been completed.
+  bool isCompleted = false;
+
+  /// Toggles whether the task is completed.
+  void toggleCompleted() {
+    isCompleted = !isCompleted;
+  }
+
   /// Creates a new [Task] with the given [name], [category], and [dueDate].
   Task({
     required this.name,
