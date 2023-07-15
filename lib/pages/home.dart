@@ -66,17 +66,23 @@ class _HomePageState extends State<HomePage> {
         ),
         // Scrollable grid of tasks.
         Expanded(
-          child: GridView.builder(
-            physics: const ScrollPhysics(),
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
+          child: Container(
+            color: Theme.of(context).colorScheme.background,
+            child: GridView.builder(
+              padding: const EdgeInsets.all(5),
+              physics: const ScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 5,
+              ),
+              itemCount: taskData.numTasks,
+              itemBuilder: (context, index) {
+                var task = taskData.tasks[index];
+                return TaskTile(task: task);
+              },
             ),
-            itemCount: taskData.numTasks,
-            itemBuilder: (context, index) {
-              var task = taskData.tasks[index];
-              return TaskTile(task: task);
-            },
           ),
         ),
       ],

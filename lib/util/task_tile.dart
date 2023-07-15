@@ -29,7 +29,22 @@ class TaskTile extends StatelessWidget {
   /// Returns the widget that displays the task as a tile.
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        padding: const EdgeInsets.all(5),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        elevation: 1,
+      ),
+      onPressed: () {
+        print('pressed');
+      },
+      onLongPress: () {
+        print('long pressed');
+      },
       child: Column(
         children: [
           Text(task.name),
