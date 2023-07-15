@@ -9,6 +9,7 @@ import '../task_data.dart';
 import '../types/category.dart';
 import '../types/time_horizon.dart';
 import '../util/filter_dropdown.dart';
+import '../util/task_tile.dart';
 
 /// Public class [HomePage] is a [StatefulWidget] that creates the home page,
 /// with all the tasks, and filtering options.
@@ -74,14 +75,7 @@ class _HomePageState extends State<HomePage> {
             itemCount: taskData.numTasks,
             itemBuilder: (context, index) {
               var task = taskData.tasks[index];
-              return Card(
-                child: Column(
-                  children: [
-                    Text(task.name),
-                    Text(task.creationDate.toString()),
-                  ],
-                ),
-              );
+              return TaskTile(task: task);
             },
           ),
         ),
