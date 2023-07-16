@@ -7,6 +7,7 @@ import 'package:todo_tiles/util/icon_text.dart';
 
 import '../task_data.dart';
 import '../types/task.dart';
+import 'task_tile_edit_dialog.dart';
 
 /// Public class [TaskTileInfoDialog] is a [StatelessWidget] that displays a
 /// [Dialog] with more information about a task.
@@ -94,7 +95,14 @@ class TaskTileInfoDialog extends StatelessWidget {
                 IconButton(
                   color: Theme.of(context).colorScheme.primary,
                   icon: const Icon(Icons.edit),
-                  onPressed: () => {},
+                  onPressed: () => {
+                    Navigator.pop(context),
+                    showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) =>
+                          TaskTileEditDialog(taskIndex: taskIndex),
+                    ),
+                  },
                 ),
                 if (task.isCompleted)
                   IconButton(

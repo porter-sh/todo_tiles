@@ -16,11 +16,11 @@ class TaskData with ChangeNotifier {
   final List<Category> _categories = [];
 
   /// Returns the list of categories, with the default categories added.
-  List<Category> get categories => [
+  UnmodifiableListView<Category> get categories => UnmodifiableListView([
         Category.all,
         Category.none,
         ..._categories,
-      ];
+      ]);
 
   /// Returns the number of categories stored.
   int get numCategories => _categories.length;
@@ -67,6 +67,13 @@ class TaskData with ChangeNotifier {
     } else {
       throw Exception('Task index out of bounds.');
     }
+  }
+
+  /// Modify a task in the list of tasks, by removing the old task and adding
+  /// the new task.
+  void modifyTask(int taskIndex, Task newTask) {
+    removeTask(taskIndex);
+    addTask(newTask);
   }
 
   /// Toggle if a task has been completed.
