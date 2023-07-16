@@ -2,6 +2,7 @@
 /// view more information about a task.
 
 import 'package:flutter/material.dart';
+import 'package:todo_tiles/util/icon_text.dart';
 
 import '../types/task.dart';
 
@@ -21,135 +22,104 @@ class TaskTileInfoDialog extends StatelessWidget {
   /// the task.
   @override
   Widget build(BuildContext context) {
-    List<Widget> taskInfoColumnChildren = [
-      Text(
-        task.name,
-        style: Theme.of(context).textTheme.headlineLarge,
-      )
-    ];
-
-    if (task.description != null) {
-      taskInfoColumnChildren.add(Text(task.description!));
-    }
-
-    taskInfoColumnChildren.addAll([
-      const Divider(),
-      Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.category),
-                    const SizedBox(width: 5),
-                    Text(task.category?.name ?? 'No category.'),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.today),
-                    const SizedBox(width: 5),
-                    Text(task.creationDate.toString().substring(5, 16)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.show_chart),
-                    SizedBox(width: 5),
-                    Text('No series.'),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.event),
-                    const SizedBox(width: 5),
-                    Text(task.dueDate?.toString().substring(0, 10) ??
-                        'No due date.'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ]);
-
-    if (task.isCompleted) {
-      taskInfoColumnChildren.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.check),
-            const SizedBox(width: 5),
-            Text(
-                'Completed: ${task.completionDate.toString().substring(0, 10)}'),
-          ],
-        ),
-      );
-    } else if (task.completionDate != null) {
-      Duration timeLeft = task.completionDate!.difference(DateTime.now());
-      taskInfoColumnChildren.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.timer),
-            const SizedBox(width: 5),
-            if (timeLeft.inDays > 0)
-              Text('${timeLeft.inDays} days left.')
-            else if (timeLeft.inHours > 0)
-              Text(
-                '${timeLeft.inHours} hours left.',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              )
-            else
-              Text(
-                '${timeLeft.inMinutes} minutes left.',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-          ],
-        ),
-      );
-    } else {
-      taskInfoColumnChildren.add(
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.timer_off),
-            SizedBox(width: 5),
-            Text('Not due.'),
-          ],
-        ),
-      );
-    }
-
-    taskInfoColumnChildren.addAll([
-      const Divider(),
-      Text('Created: ${task.creationDate.toString()}'),
-    ]);
+    IconText countdownWidget = getCountdownWidget(context);
 
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: taskInfoColumnChildren,
+          children: [
+            Text(
+              task.name,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            if (task.description != null) Text(task.description!),
+            const Divider(),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconText(
+                        icon: const Icon(Icons.category),
+                        text: Text(task.category?.name ?? 'No category.'),
+                      ),
+                      IconText(
+                        icon: const Icon(Icons.today),
+                        text:
+                            Text(task.creationDate.toString().substring(5, 16)),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const IconText(
+                        icon: Icon(Icons.show_chart),
+                        text: Text('No series.'),
+                      ),
+                      IconText(
+                        icon: const Icon(Icons.event),
+                        text: Text(task.dueDate?.toString().substring(5, 16) ??
+                            'No due date.'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            countdownWidget,
+            const Divider(),
+            Text('Created: ${task.creationDate.toString()}'),
+          ],
         ),
       ),
+    );
+  }
+
+  /// Returns a widget that displays a countdown if the task is due. Otherwise,
+  /// returns a widget that displays that the task is either already completed,
+  /// or has no due date.
+  IconText getCountdownWidget(BuildContext context) {
+    if (task.isCompleted) {
+      return IconText(
+        icon: const Icon(Icons.task_alt),
+        text: Text(
+            'Completed: ${task.completionDate.toString().substring(5, 16)}'),
+      );
+    }
+
+    if (task.completionDate != null) {
+      Duration timeLeft = task.completionDate!.difference(DateTime.now());
+      Text timeLeftText;
+      // Create a different message based on when the task is due.
+      if (timeLeft.inDays > 0) {
+        timeLeftText = Text('${timeLeft.inDays} days left.');
+      } else if (timeLeft.inHours > 0) {
+        timeLeftText = Text(
+          '${timeLeft.inHours} hours left.',
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        );
+      } else {
+        timeLeftText = Text(
+          '${timeLeft.inMinutes} minutes left.',
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        );
+      }
+
+      return IconText(
+        icon: const Icon(Icons.timer),
+        text: timeLeftText,
+      );
+    }
+
+    return const IconText(
+      icon: Icon(Icons.timer_off),
+      text: Text('Not due.'),
     );
   }
 }
