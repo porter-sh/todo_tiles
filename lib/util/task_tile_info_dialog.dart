@@ -2,8 +2,10 @@
 /// view more information about a task.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_tiles/util/icon_text.dart';
 
+import '../task_data.dart';
 import '../types/task.dart';
 
 /// Public class [TaskTileInfoDialog] is a [StatelessWidget] that displays a
@@ -12,17 +14,19 @@ class TaskTileInfoDialog extends StatelessWidget {
   /// Creates a [TaskTileInfoDialog] widget.
   const TaskTileInfoDialog({
     super.key,
-    required this.task,
+    required this.taskIndex,
   });
 
   /// The task to display.
-  final Task task;
+  final int taskIndex;
 
   /// Returns the widget that displays the [Dialog] with more information about
   /// the task.
   @override
   Widget build(BuildContext context) {
-    IconText countdownWidget = getCountdownWidget(context);
+    TaskData taskData = context.watch<TaskData>();
+    Task task = taskData.tasks[taskIndex];
+    IconText countdownWidget = getCountdownWidget(context, task);
 
     return Dialog(
       child: Padding(
@@ -74,7 +78,38 @@ class TaskTileInfoDialog extends StatelessWidget {
             ),
             countdownWidget,
             const Divider(),
-            Text('Created: ${task.creationDate.toString()}'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                    color: Colors.red,
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // wait for the dialog to close before removing the task
+                      Future.delayed(const Duration(milliseconds: 150), () {
+                        taskData.removeTask(taskIndex);
+                      });
+                    }),
+                IconButton(
+                  color: Theme.of(context).colorScheme.primary,
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => {},
+                ),
+                if (task.isCompleted)
+                  IconButton(
+                    color: Colors.grey,
+                    icon: const Icon(Icons.check),
+                    onPressed: () => taskData.markTaskIncomplete(taskIndex),
+                  )
+                else
+                  IconButton(
+                    color: Colors.green,
+                    icon: const Icon(Icons.check),
+                    onPressed: () => taskData.markTaskComplete(taskIndex),
+                  ),
+              ],
+            )
           ],
         ),
       ),
@@ -84,7 +119,7 @@ class TaskTileInfoDialog extends StatelessWidget {
   /// Returns a widget that displays a countdown if the task is due. Otherwise,
   /// returns a widget that displays that the task is either already completed,
   /// or has no due date.
-  IconText getCountdownWidget(BuildContext context) {
+  IconText getCountdownWidget(BuildContext context, Task task) {
     if (task.isCompleted) {
       return IconText(
         icon: const Icon(Icons.task_alt),

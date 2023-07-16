@@ -23,12 +23,26 @@ class Task {
   /// When the task was completed.
   DateTime? completionDate;
 
+  /// Completes the task if it isn't already.
+  void markComplete() {
+    if (!isCompleted) {
+      completionDate = DateTime.now();
+    }
+  }
+
+  /// Uncompletes the task if it is completed.
+  void markIncomplete() {
+    if (isCompleted) {
+      completionDate = null;
+    }
+  }
+
   /// Toggles whether the task is completed.
   void toggleCompleted() {
     if (isCompleted) {
-      completionDate = null;
+      markIncomplete();
     } else {
-      completionDate = DateTime.now();
+      markComplete();
     }
   }
 

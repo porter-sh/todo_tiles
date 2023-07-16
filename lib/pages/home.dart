@@ -79,8 +79,7 @@ class _HomePageState extends State<HomePage> {
               ),
               itemCount: taskData.numTasks,
               itemBuilder: (context, index) {
-                var task = taskData.tasks[index];
-                return TaskTile(task: task);
+                return TaskTile(taskIndex: index);
               },
             ),
           ),

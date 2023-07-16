@@ -2,6 +2,8 @@
 /// this should be responsible for interacting with a database, but for now, it
 /// just stores the data in memory.
 
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 
 import 'types/category.dart';
@@ -42,8 +44,9 @@ class TaskData with ChangeNotifier {
   /// The list of user-created tasks.
   final List<Task> _tasks = [];
 
-  /// Returns the list of tasks.
-  List<Task> get tasks => _tasks;
+  /// Returns the list of tasks that can't be changed, because that would
+  /// violate state.
+  UnmodifiableListView<Task> get tasks => UnmodifiableListView(_tasks);
 
   /// Returns the number of tasks stored.
   int get numTasks => _tasks.length;
@@ -56,11 +59,43 @@ class TaskData with ChangeNotifier {
     }
   }
 
-  /// Remove a task from the list of tasks if it is in the list.
-  void removeTask(Task task) {
-    if (_tasks.contains(task)) {
-      _tasks.remove(task);
+  /// Remove a task from the list of tasks.
+  void removeTask(int taskIndex) {
+    if (taskIndex < _tasks.length) {
+      _tasks.removeAt(taskIndex);
       notifyListeners();
+    } else {
+      throw Exception('Task index out of bounds.');
+    }
+  }
+
+  /// Toggle if a task has been completed.
+  void toggleTaskCompleted(int taskIndex) {
+    if (taskIndex < _tasks.length) {
+      _tasks[taskIndex].toggleCompleted();
+      notifyListeners();
+    } else {
+      throw Exception('Task index out of bounds.');
+    }
+  }
+
+  /// Mark a task as complete.
+  void markTaskComplete(int taskIndex) {
+    if (taskIndex < _tasks.length) {
+      _tasks[taskIndex].markComplete();
+      notifyListeners();
+    } else {
+      throw Exception('Task index out of bounds.');
+    }
+  }
+
+  /// Mark a task as incomplete.
+  void markTaskIncomplete(int taskIndex) {
+    if (taskIndex < _tasks.length) {
+      _tasks[taskIndex].markIncomplete();
+      notifyListeners();
+    } else {
+      throw Exception('Task index out of bounds.');
     }
   }
 }
