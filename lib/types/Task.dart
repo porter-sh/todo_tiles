@@ -28,6 +28,9 @@ class Task {
     isCompleted = !isCompleted;
   }
 
+  // When the task was completed.
+  DateTime? completionDate;
+
   /// Creates a new [Task] with the given [name], [category], and [dueDate].
   Task({
     required this.name,

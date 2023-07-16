@@ -1,15 +1,9 @@
-/// TODO
-/// tile widget
-///
-/// on tap, mark completed
-/// on long press, open alert dialog to edit
-/// when typing, move to ensure visibility
-
 /// This file contains a widget that displays a task as a tile. It is
 /// responsible for handling all the interactions with the task, such as
 /// marking it as completed, editing it, and deleting it.
 
 import 'package:flutter/material.dart';
+import 'package:todo_tiles/util/task_tile_info_dialog.dart';
 
 import '../types/task.dart';
 
@@ -55,9 +49,10 @@ class _TaskTileState extends State<TaskTile> {
           widget.task.toggleCompleted();
         });
       },
-      onLongPress: () {
-        print('long pressed');
-      },
+      onLongPress: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) =>
+              TaskTileInfoDialog(task: widget.task)),
       child: Column(
         children: [
           Text(widget.task.name),
