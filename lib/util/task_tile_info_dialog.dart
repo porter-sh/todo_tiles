@@ -137,7 +137,7 @@ class TaskTileInfoDialog extends StatelessWidget {
     }
 
     if (task.completionDate != null) {
-      Duration timeLeft = task.completionDate!.difference(DateTime.now());
+      Duration timeLeft = task.dueDate!.difference(DateTime.now());
       Text timeLeftText;
       // Create a different message based on when the task is due.
       if (timeLeft.inDays > 0) {

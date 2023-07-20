@@ -21,6 +21,19 @@ class Category implements FilterMenuItem<Category> {
   /// Creates a new [Category] with the given [name].
   const Category({required this.name, this.description = ''});
 
+  /// Creates a new [Category] from a map of values.
+  Category.fromMap(Map<String, dynamic> map)
+      : name = map['name'],
+        description = map['description'];
+
+  /// Converts the [Category] to a map of values.
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'description': description,
+    };
+  }
+
   /// Returns the name of the category.
   @override
   String get value => name;

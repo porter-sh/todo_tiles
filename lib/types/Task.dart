@@ -57,6 +57,30 @@ class Task {
     this.dueDate,
   });
 
+  /// Creates a new [Task] from a map of values.
+  Task.fromMap(Map<String, dynamic> map)
+      : name = map['name'],
+        description = map['description'],
+        category = map['category'],
+        dueDate =
+            map['dueDate'] != 'NULL' ? DateTime.parse(map['dueDate']) : null,
+        creationDate = DateTime.parse(map['creationDate']),
+        completionDate = map['completionDate'] != 'NULL'
+            ? DateTime.parse(map['completionDate'])
+            : null;
+
+  /// Converts the [Task] to a map of values.
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'description': description,
+      'category': category,
+      'dueDate': dueDate?.toString() ?? 'NULL',
+      'creationDate': creationDate.toString(),
+      'completionDate': completionDate?.toString() ?? 'NULL',
+    };
+  }
+
   /// Overrides the equality operator so that two tasks are equal if they have
   /// the same unique identifier. This way, even tasks with all the same details
   /// are consedered to be different tasks.
@@ -72,5 +96,5 @@ class Task {
   /// Overrides the hashcode getter so that no two tasks would reasonably have
   /// the same hashcode.
   @override
-  int get hashCode => (name + creationDate.toString()).hashCode;
+  int get hashCode => (creationDate.toString()).hashCode;
 }
