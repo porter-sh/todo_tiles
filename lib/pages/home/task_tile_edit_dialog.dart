@@ -14,11 +14,11 @@ class TaskTileEditDialog extends StatefulWidget {
   /// Creates a [TaskTileEditDialog] widget.
   const TaskTileEditDialog({
     super.key,
-    required this.taskIndex,
+    this.taskIndex,
   });
 
-  /// The index of the task to edit.
-  final int taskIndex;
+  /// The index of the task to edit. Null if the task is new.
+  final int? taskIndex;
 
   /// Returns the state of the [TaskTileEditDialog] widget.
   @override
@@ -49,10 +49,17 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
     TaskData taskData = context.watch<TaskData>();
 
     // Update the text fields with the current values of the task.
-    name ??= taskData.tasks[widget.taskIndex].name;
-    description ??= taskData.tasks[widget.taskIndex].description;
-    category ??= taskData.tasks[widget.taskIndex].category;
-    dueDate ??= taskData.tasks[widget.taskIndex].dueDate;
+    if (widget.taskIndex != null) {
+      name ??= taskData.tasks[widget.taskIndex!].name;
+      description ??= taskData.tasks[widget.taskIndex!].description;
+      category ??= taskData.tasks[widget.taskIndex!].category;
+      dueDate ??= taskData.tasks[widget.taskIndex!].dueDate;
+    } else {
+      // Default values for new Task.
+      name ??= '';
+      category ??= Category.none;
+      dueDate ??= null;
+    }
 
     // Text controller for updating the date with the date picker.
     TextEditingController dateController = TextEditingController(
@@ -69,15 +76,27 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
             onPressed: () {
               // Validate the form when the user submits it.
               if (_formKey.currentState!.validate()) {
-                taskData.modifyTask(
-                  widget.taskIndex,
-                  Task(
-                    name: name!,
-                    description: description,
-                    category: category,
-                    dueDate: dueDate,
-                  ),
-                );
+                if (widget.taskIndex == null) {
+                  print('printing category');
+                  taskData.addTask(
+                    Task(
+                      name: name!,
+                      description: description,
+                      category: category,
+                      dueDate: dueDate,
+                    ),
+                  );
+                } else {
+                  taskData.modifyTask(
+                    widget.taskIndex!,
+                    Task(
+                      name: name!,
+                      description: description,
+                      category: category,
+                      dueDate: dueDate,
+                    ),
+                  );
+                }
                 Navigator.pop(context);
               }
             },

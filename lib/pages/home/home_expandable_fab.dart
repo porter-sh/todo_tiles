@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../task_data.dart';
 import '../../types/category.dart';
-import '../../types/task.dart';
+import 'task_tile_edit_dialog.dart';
 
 /// Public class [HomeExpandableFab] simply builds an [ExpandableFab] with the
 /// correct colors and icons for the home page.
@@ -40,7 +40,12 @@ class HomeExpandableFab extends StatelessWidget {
             icon: const Icon(Icons.task),
             label: const Text('Task'),
             onPressed: () {
-              taskData.addTask(Task(name: 'New Task'));
+              // Fullscreen popup for editing the task. TaskTileEditDialog takes
+              // no parameter in order to create the task.
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => const TaskTileEditDialog(),
+              );
             }),
         ExpandedFabButton(
             icon: const Icon(Icons.category),
