@@ -5,11 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../task_data.dart';
-import '../types/category.dart';
-import '../types/time_horizon.dart';
-import '../util/filter_dropdown.dart';
-import '../util/task_tile.dart';
+import '../../task_data.dart';
+import '../../types/category.dart';
+import '../../types/time_horizon.dart';
+import '../../util/filter_dropdown.dart';
+import './task_tile.dart';
 
 /// Public class [HomePage] is a [StatefulWidget] that creates the home page,
 /// with all the tasks, and filtering options.

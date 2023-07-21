@@ -6,10 +6,10 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 import 'pages/friends.dart';
 import 'pages/history.dart';
-import 'pages/home.dart';
+import 'pages/home/home.dart';
 import 'pages/profile.dart';
 import 'pages/settings.dart';
-import 'prebuilt/home_expandable_fab.dart';
+import 'pages/home/home_expandable_fab.dart';
 
 /// Public class [PageSelector] is a [StatefulWidget] that creates the layout of the
 /// app with the private class [_PageSelectorState].

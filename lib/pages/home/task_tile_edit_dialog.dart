@@ -4,9 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../task_data.dart';
-import '../types/task.dart';
-import '../types/category.dart';
+import '../../task_data.dart';
+import '../../types/task.dart';
+import '../../types/category.dart';
 
 /// Public class [TaskTileEditDialog] is a [StatefulWidget] that displays a
 /// fullscreen dialog that allows the user to edit a task.

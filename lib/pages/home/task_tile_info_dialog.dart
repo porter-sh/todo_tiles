@@ -3,10 +3,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_tiles/util/icon_text.dart';
 
-import '../task_data.dart';
-import '../types/task.dart';
+import '../../util/icon_text.dart';
+import '../../task_data.dart';
+import '../../types/task.dart';
 import 'task_tile_edit_dialog.dart';
 
 /// Public class [TaskTileInfoDialog] is a [StatelessWidget] that displays a

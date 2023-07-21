@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:provider/provider.dart';
 
-import '../task_data.dart';
-import '../types/category.dart';
-import '../types/task.dart';
+import '../../task_data.dart';
+import '../../types/category.dart';
+import '../../types/task.dart';
 
 /// Public class [HomeExpandableFab] simply builds an [ExpandableFab] with the
 /// correct colors and icons for the home page.

@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_tiles/task_data.dart';
-import 'package:todo_tiles/util/task_tile_info_dialog.dart';
 
-import '../types/task.dart';
+import '../../task_data.dart';
+import '../../types/task.dart';
+import './task_tile_info_dialog.dart';
 
 /// Public class [TaskTile] is a [StatelessWidget] that displays a task as a
 /// tile. It is responsible for handling all the interactions with the task,
