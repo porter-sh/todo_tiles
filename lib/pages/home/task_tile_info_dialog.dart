@@ -49,7 +49,7 @@ class TaskTileInfoDialog extends StatelessWidget {
                     children: [
                       IconText(
                         icon: const Icon(Icons.category),
-                        text: Text(task.category?.name ?? 'No category.'),
+                        text: Text(task.category.name ?? 'No category.'),
                       ),
                       IconText(
                         icon: const Icon(Icons.today),
@@ -136,33 +136,33 @@ class TaskTileInfoDialog extends StatelessWidget {
       );
     }
 
-    if (task.completionDate != null) {
-      Duration timeLeft = task.dueDate!.difference(DateTime.now());
-      Text timeLeftText;
-      // Create a different message based on when the task is due.
-      if (timeLeft.inDays > 0) {
-        timeLeftText = Text('${timeLeft.inDays} days left.');
-      } else if (timeLeft.inHours > 0) {
-        timeLeftText = Text(
-          '${timeLeft.inHours} hours left.',
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        );
-      } else {
-        timeLeftText = Text(
-          '${timeLeft.inMinutes} minutes left.',
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        );
-      }
-
-      return IconText(
-        icon: const Icon(Icons.timer),
-        text: timeLeftText,
+    if (!task.isDue) {
+      return const IconText(
+        icon: Icon(Icons.timer_off),
+        text: Text('Not due.'),
       );
     }
 
-    return const IconText(
-      icon: Icon(Icons.timer_off),
-      text: Text('Not due.'),
+    Duration timeLeft = task.dueDate!.difference(DateTime.now());
+    Text timeLeftText;
+    // Create a different message based on when the task is due.
+    if (timeLeft.inDays > 0) {
+      timeLeftText = Text('${timeLeft.inDays} days left.');
+    } else if (timeLeft.inHours > 0) {
+      timeLeftText = Text(
+        '${timeLeft.inHours} hours left.',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      );
+    } else {
+      timeLeftText = Text(
+        '${timeLeft.inMinutes} minutes left.',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      );
+    }
+
+    return IconText(
+      icon: const Icon(Icons.timer),
+      text: timeLeftText,
     );
   }
 }

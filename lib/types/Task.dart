@@ -49,6 +49,9 @@ class Task {
   /// Whether the task is completed.
   bool get isCompleted => completionDate != null;
 
+  /// Whether the task has a due date.
+  bool get isDue => dueDate != null;
+
   /// Creates a new [Task] with the given [name], [category], and [dueDate].
   Task({
     required this.name,
