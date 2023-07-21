@@ -17,7 +17,10 @@ class HomeExpandableFab extends StatelessWidget {
   @override
   Widget build(context) {
     var taskData = context.watch<TaskData>();
+    final key = GlobalObjectKey<ExpandableFabState>(context);
     return ExpandableFab(
+      // The key is used for closing the FAB.
+      key: key,
       type: ExpandableFabType.up,
       distance: 70.0,
       childrenOffset: const Offset(0, -5.0),
@@ -40,6 +43,11 @@ class HomeExpandableFab extends StatelessWidget {
             icon: const Icon(Icons.task),
             label: const Text('Task'),
             onPressed: () {
+              // Close the FAB.
+              final state = key.currentState;
+              if (state != null && state.isOpen) {
+                state.toggle();
+              }
               // Fullscreen popup for editing the task. TaskTileEditDialog takes
               // no parameter in order to create the task.
               showDialog<String>(
