@@ -9,7 +9,7 @@ class Category implements FilterMenuItem<Category> {
   final String name;
 
   /// A description of the category.
-  final String description;
+  final String? description;
 
   /// The category representing all tasks.
   static const Category all = Category(name: 'All', description: 'All tasks.');
@@ -19,18 +19,18 @@ class Category implements FilterMenuItem<Category> {
       Category(name: 'None', description: 'No category assigned.');
 
   /// Creates a new [Category] with the given [name].
-  const Category({required this.name, this.description = ''});
+  const Category({required this.name, this.description});
 
   /// Creates a new [Category] from a map of values.
   Category.fromMap(Map<String, dynamic> map)
       : name = map['name'],
-        description = map['description'];
+        description = map['description'] == 'NULL' ? null : map['description'];
 
   /// Converts the [Category] to a map of values.
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'description': description,
+      'description': description ?? 'NULL',
     };
   }
 

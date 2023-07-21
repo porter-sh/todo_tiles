@@ -44,6 +44,7 @@ class TaskData with ChangeNotifier {
           '''CREATE TABLE categories(
             id INTEGER PRIMARY KEY,
             name TEXT,
+            description TEXT,
             color TEXT
           )''',
         );
