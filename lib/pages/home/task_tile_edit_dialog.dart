@@ -77,12 +77,11 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
               // Validate the form when the user submits it.
               if (_formKey.currentState!.validate()) {
                 if (widget.taskIndex == null) {
-                  print('printing category');
                   taskData.addTask(
                     Task(
                       name: name!,
                       description: description,
-                      category: category,
+                      category: category ?? Category.none,
                       dueDate: dueDate,
                     ),
                   );
@@ -92,7 +91,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                     Task(
                       name: name!,
                       description: description,
-                      category: category,
+                      category: category ?? Category.none,
                       dueDate: dueDate,
                     ),
                   );
@@ -137,7 +136,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
               decoration: const InputDecoration(
                 labelText: 'Category',
               ),
-              items: taskData.categories
+              items: taskData.setCategories
                   .map(
                     (Category category) => DropdownMenuItem<Category>(
                       value: category,

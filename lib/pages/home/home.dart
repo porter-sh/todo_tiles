@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
               // Category filter.
               FilterDropdown<Category>(
                 value: categoryView,
-                items: taskData.categories,
+                items: taskData.sortCategories,
                 onChanged: (Category? newValue) {
                   setState(() {
                     categoryView = newValue!;

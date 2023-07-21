@@ -12,7 +12,7 @@ class Task {
   final String? description;
 
   /// The category of the task.
-  final Category? category;
+  final Category category;
 
   /// The due date of the task.
   final DateTime? dueDate;
@@ -53,15 +53,16 @@ class Task {
   Task({
     required this.name,
     this.description,
-    this.category,
+    this.category = Category.none,
     this.dueDate,
   });
 
-  /// Creates a new [Task] from a map of values.
-  Task.fromMap(Map<String, dynamic> map)
+  /// Creates a new [Task] from a map of values. The [category] parameter is
+  /// optional and defaults to [Category.none], but category can not be read
+  /// from the database as a [Category] object, so it must be passed in.
+  Task.fromMap(Map<String, dynamic> map, [this.category = Category.none])
       : name = map['name'],
         description = map['description'],
-        category = map['category'],
         dueDate =
             map['dueDate'] != 'NULL' ? DateTime.parse(map['dueDate']) : null,
         creationDate = DateTime.parse(map['creationDate']),
@@ -72,9 +73,10 @@ class Task {
   /// Converts the [Task] to a map of values.
   Map<String, dynamic> toMap() {
     return {
+      'id': hashCode,
       'name': name,
       'description': description,
-      'category': category,
+      'category': category.name,
       'dueDate': dueDate?.toString() ?? 'NULL',
       'creationDate': creationDate.toString(),
       'completionDate': completionDate?.toString() ?? 'NULL',
@@ -96,5 +98,5 @@ class Task {
   /// Overrides the hashcode getter so that no two tasks would reasonably have
   /// the same hashcode.
   @override
-  int get hashCode => (creationDate.toString()).hashCode;
+  int get hashCode => creationDate.hashCode;
 }

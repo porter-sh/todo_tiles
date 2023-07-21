@@ -54,19 +54,26 @@ class TaskData with ChangeNotifier {
 
     _database = await database;
 
-    // Load the tasks from the database.
-    final List<Map<String, dynamic>> taskMaps = await _database.query('tasks');
-    for (var element in taskMaps) {
-      print('printing all entries in the database');
-      print(element);
-    }
-    _tasks = taskMaps.map((taskMap) => Task.fromMap(taskMap)).toList();
-
     // Load the categories from the database.
     final List<Map<String, dynamic>> categoryMaps =
         await _database.query('categories');
     _categories = categoryMaps
         .map((categoryMap) => Category.fromMap(categoryMap))
+        .toList();
+
+    // Load the tasks from the database.
+    final List<Map<String, dynamic>> taskMaps = await _database.query('tasks');
+    // Change the category field of each map from a string to the corresponding
+    // Category object from _categories if it exists. Otherwise, use
+    // Category.none.
+    _tasks = taskMaps
+        .map((taskMap) => Task.fromMap(
+              taskMap,
+              _categories.firstWhere(
+                (category) => category.name == taskMap['category'],
+                orElse: () => Category.none,
+              ),
+            ))
         .toList();
 
     notifyListeners();
@@ -75,12 +82,17 @@ class TaskData with ChangeNotifier {
   /// The list of user-created task categories.
   List<Category> _categories = [];
 
-  /// Returns the list of categories, with the default categories added.
-  UnmodifiableListView<Category> get categories => UnmodifiableListView([
+  /// Returns the list of categories, with the default categories added. This is
+  /// used for sorting tasks by category.
+  UnmodifiableListView<Category> get sortCategories => UnmodifiableListView([
         Category.all,
         Category.none,
         ..._categories,
       ]);
+
+  /// Returns the list of categories that the user can set for a task.
+  UnmodifiableListView<Category> get setCategories =>
+      UnmodifiableListView([Category.none, ..._categories]);
 
   /// Returns the number of categories stored.
   int get numCategories => _categories.length;
@@ -128,16 +140,11 @@ class TaskData with ChangeNotifier {
     if (!_tasks.contains(task)) {
       _tasks.add(task);
       // Update the database.
-      try {
-        _database.insert(
-          'tasks',
-          task.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      } catch (e) {
-        print('in catch ######');
-        print(e);
-      }
+      _database.insert(
+        'tasks',
+        task.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
       notifyListeners();
     }
   }
@@ -145,13 +152,14 @@ class TaskData with ChangeNotifier {
   /// Remove a task from the list of tasks.
   void removeTask(int taskIndex) {
     if (taskIndex < _tasks.length) {
-      _tasks.removeAt(taskIndex);
       // Update the database.
       _database.delete(
         'tasks',
         where: 'id = ?',
-        whereArgs: [taskIndex],
+        whereArgs: [_tasks[taskIndex].hashCode],
       );
+      // Remove the task from the list.
+      _tasks.removeAt(taskIndex);
       notifyListeners();
     } else {
       throw Exception('Task index out of bounds.');
