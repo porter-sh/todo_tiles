@@ -3,9 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
-import 'package:provider/provider.dart';
 
-import '../../task_data.dart';
 import 'category_edit_dialog.dart';
 import 'task_tile_edit_dialog.dart';
 
@@ -16,7 +14,6 @@ class HomeExpandableFab extends StatelessWidget {
 
   @override
   Widget build(context) {
-    var taskData = context.watch<TaskData>();
     final key = GlobalObjectKey<ExpandableFabState>(context);
     return ExpandableFab(
       // The key is used for closing the FAB.

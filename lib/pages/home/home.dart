@@ -10,6 +10,7 @@ import '../../types/category.dart';
 import '../../types/time_horizon.dart';
 import '../../util/filter_dropdown.dart';
 import './task_tile.dart';
+import 'category_edit_dialog.dart';
 
 /// Public class [HomePage] is a [StatefulWidget] that creates the home page,
 /// with all the tasks, and filtering options.
@@ -24,7 +25,7 @@ class HomePage extends StatefulWidget {
 /// the public class [HomePage].
 class _HomePageState extends State<HomePage> {
   // Currently selected category filter.
-  Category categoryView = Category.all;
+  int selectedCategoryIndex = 0;
   // Currently selected due date filter.
   TimeHorizon timeHorizonView = TimeHorizon.all;
 
@@ -32,6 +33,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     var taskData = context.watch<TaskData>();
+
+    // Safeguard against when the last category is deleted.
+    if (selectedCategoryIndex >= taskData.sortCategories.length) {
+      setState(() {
+        selectedCategoryIndex = 0;
+      });
+    }
+
     return Column(
       children: [
         // Banner at the top for selecting filters by category and due date.
@@ -42,12 +51,35 @@ class _HomePageState extends State<HomePage> {
             children: [
               // Category filter.
               FilterDropdown<Category>(
-                value: categoryView,
+                value: taskData.sortCategories[selectedCategoryIndex],
                 items: taskData.sortCategories,
                 onChanged: (Category? newValue) {
                   setState(() {
-                    categoryView = newValue!;
+                    int newIndex;
+                    try {
+                      newIndex = taskData.sortCategories.indexOf(newValue!);
+                    } catch (e) {
+                      newIndex = 0;
+                    }
+                    setState(() {
+                      selectedCategoryIndex = newIndex;
+                    });
                   });
+                },
+                onLongPress: ({Category? object, int? index}) {
+                  // Fullscreen popup for editing the category.
+                  if (index! > 0) {
+                    // Close the dropdown.
+                    Navigator.of(context).pop();
+                    setState(() {
+                      selectedCategoryIndex = index;
+                    });
+                    showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) =>
+                          CategoryEditDialog(categoryIndex: index - 1),
+                    );
+                  }
                 },
               ),
               const SizedBox(width: 10),

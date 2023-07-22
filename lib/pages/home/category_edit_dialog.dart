@@ -40,8 +40,9 @@ class _CategoryEditDialogState extends State<CategoryEditDialog> {
 
     // Update the text fields with the current values of the category.
     if (widget.categoryIndex != null) {
-      name ??= taskData.setCategories[widget.categoryIndex!].name;
-      description ??= taskData.setCategories[widget.categoryIndex!].description;
+      name ??= taskData.userCategories[widget.categoryIndex!].name;
+      description ??=
+          taskData.userCategories[widget.categoryIndex!].description;
     } else {
       // Default values for new Category.
       name ??= '';
@@ -52,6 +53,20 @@ class _CategoryEditDialogState extends State<CategoryEditDialog> {
       appBar: AppBar(
         title: const Text('Edit Category'),
         actions: [
+          // Button to delete the category if it is not a new category.
+          if (widget.categoryIndex != null)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                Navigator.pop(context);
+                // Wait for the dialog to close before deleting the category.
+                Future.delayed(const Duration(milliseconds: 150), () {
+                  taskData.removeCategory(
+                      taskData.userCategories[widget.categoryIndex!]);
+                });
+              },
+            ),
+          // Button to save changes.
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {

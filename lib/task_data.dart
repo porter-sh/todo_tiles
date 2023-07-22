@@ -82,6 +82,10 @@ class TaskData with ChangeNotifier {
   /// The list of user-created task categories.
   List<Category> _categories = [];
 
+  /// Returns only the list of categories that have been created by the user.
+  UnmodifiableListView<Category> get userCategories =>
+      UnmodifiableListView(_categories);
+
   /// Returns the list of categories, with the default categories added. This is
   /// used for sorting tasks by category.
   UnmodifiableListView<Category> get sortCategories =>

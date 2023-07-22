@@ -14,14 +14,21 @@ class FilterDropdown<T extends FilterMenuItem<T>> extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    this.onLongPress = _defaultOnLongPress,
     required this.items,
   });
+
+  /// The default onLongPress callback for the dropdown.
+  static void _defaultOnLongPress({FilterMenuItem? object, int? index}) {}
 
   /// The currently selected value.
   final T value;
 
   /// The callback that is called when the user selects a value.
   final void Function(T?) onChanged;
+
+  /// The callback that is called when the user long-presses on a value.
+  final void Function({T object, int index}) onLongPress;
 
   /// The list of items to display in the dropdown.
   final List<T> items;
@@ -40,10 +47,17 @@ class FilterDropdown<T extends FilterMenuItem<T>> extends StatelessWidget {
       child: DropdownButton<T>(
         value: value,
         onChanged: onChanged,
-        items: items.map((T item) {
+        items: List.generate(items.length, (i) {
           return DropdownMenuItem<T>(
-            value: item,
-            child: Text(item.value),
+            value: items[i],
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onLongPress: () => onLongPress(object: items[i], index: i),
+              child: Container(
+                alignment: Alignment.centerLeft,
+                child: Text(items[i].value),
+              ),
+            ),
           );
         }).toList(),
       ),
