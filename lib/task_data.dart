@@ -84,11 +84,8 @@ class TaskData with ChangeNotifier {
 
   /// Returns the list of categories, with the default categories added. This is
   /// used for sorting tasks by category.
-  UnmodifiableListView<Category> get sortCategories => UnmodifiableListView([
-        Category.all,
-        Category.none,
-        ..._categories,
-      ]);
+  UnmodifiableListView<Category> get sortCategories =>
+      UnmodifiableListView([Category.all, ..._categories]);
 
   /// Returns the list of categories that the user can set for a task.
   UnmodifiableListView<Category> get setCategories =>
@@ -123,6 +120,13 @@ class TaskData with ChangeNotifier {
       );
       notifyListeners();
     }
+  }
+
+  /// Modify a category in the list of categories by removing the old category
+  /// and adding the new category.
+  void modifyCategory(int categoryIndex, Category newCategory) {
+    removeCategory(_categories[categoryIndex]);
+    addCategory(newCategory);
   }
 
   /// The list of user-created tasks.

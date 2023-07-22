@@ -6,7 +6,7 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:provider/provider.dart';
 
 import '../../task_data.dart';
-import '../../types/category.dart';
+import 'category_edit_dialog.dart';
 import 'task_tile_edit_dialog.dart';
 
 /// Public class [HomeExpandableFab] simply builds an [ExpandableFab] with the
@@ -59,7 +59,17 @@ class HomeExpandableFab extends StatelessWidget {
             icon: const Icon(Icons.category),
             label: const Text('Category'),
             onPressed: () {
-              taskData.addCategory(const Category(name: 'New Category'));
+              // Close the FAB.
+              final state = key.currentState;
+              if (state != null && state.isOpen) {
+                state.toggle();
+              }
+              // Fullscreen popup for editing the category. CategoryEditDialog
+              // takes no parameter in order to create the category.
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => const CategoryEditDialog(),
+              );
             }),
         ExpandedFabButton(
             icon: const Icon(Icons.show_chart),

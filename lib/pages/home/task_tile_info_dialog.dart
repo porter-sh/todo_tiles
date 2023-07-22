@@ -49,7 +49,7 @@ class TaskTileInfoDialog extends StatelessWidget {
                     children: [
                       IconText(
                         icon: const Icon(Icons.category),
-                        text: Text(task.category.name ?? 'No category.'),
+                        text: Text(task.category.name),
                       ),
                       IconText(
                         icon: const Icon(Icons.today),

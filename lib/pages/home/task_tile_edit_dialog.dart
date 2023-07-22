@@ -105,7 +105,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16.0),
           children: [
             TextFormField(
               initialValue: name,
@@ -122,6 +122,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                 name = value;
               },
             ),
+            const SizedBox(height: 16.0),
             TextFormField(
               initialValue: description,
               decoration: const InputDecoration(
@@ -131,6 +132,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                 description = value;
               },
             ),
+            const SizedBox(height: 16.0),
             DropdownButtonFormField<Category>(
               value: category,
               decoration: const InputDecoration(
@@ -148,6 +150,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                 category = value;
               },
             ),
+            const SizedBox(height: 16.0),
             TextFormField(
               controller: dateController,
               decoration: InputDecoration(
