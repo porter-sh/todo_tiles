@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "51563568011",
+    "project_id": "todo-tiles",
+    "storage_bucket": "todo-tiles.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:51563568011:android:cb7ff06cabe054729e6d8e",
+        "android_client_info": {
+          "package_name": "com.example.todo_tiles"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "51563568011-fjinoq64p6177ffdq21rvr6ptd65n4vd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh_CXpvIai5AhYWEfMOQZ7mRSa0wG2Guc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "51563568011-fjinoq64p6177ffdq21rvr6ptd65n4vd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "51563568011-f84ke5b252sagrs8onpgr807toguoghi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.todoTiles.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

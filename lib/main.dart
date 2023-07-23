@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-import 'page_selector.dart';
+import 'pages/auth_page.dart';
 import 'task_data.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MainApp());
 }
 
@@ -31,7 +37,9 @@ class MainApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const PageSelector(),
+        // home: const PageSelector(),
+        // home: const Login(),
+        home: const AuthPage(),
       ),
     );
   }

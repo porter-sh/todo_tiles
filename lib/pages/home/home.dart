@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import '../../task_data.dart';
 import '../../types/category.dart';
 import '../../types/time_horizon.dart';
-import '../../util/filter_dropdown.dart';
+import '../../components/filter_dropdown.dart';
 import './task_tile.dart';
 import 'category_edit_dialog.dart';
 

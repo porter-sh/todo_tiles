@@ -60,7 +60,7 @@ class _PageSelectorState extends State<PageSelector> {
         page = const SettingsPage();
         break;
       case 4:
-        page = const ProfilePage();
+        page = ProfilePage();
         break;
       default:
         page = const HomePage();
