@@ -22,7 +22,7 @@ class AuthPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.active) {
             final user = snapshot.data;
             if (user == null) {
-              return Login();
+              return const Login();
             }
             return const PageSelector();
           }
