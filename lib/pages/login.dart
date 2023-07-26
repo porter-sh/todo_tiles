@@ -4,6 +4,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../components/outlined_text_form_field.dart';
 
@@ -116,6 +117,22 @@ class _LoginState extends State<Login> {
     }
   }
 
+  /// Sign in or create an account with Google.
+  void signInWithGoogle({required BuildContext context}) async {
+    // Start the sign-in process.
+    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+    // Get the authentication details from the request.
+    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+    // Create a new credential.
+    final credential = GoogleAuthProvider.credential(
+      accessToken: gAuth.accessToken,
+      idToken: gAuth.idToken,
+    );
+
+    // Sign in to Firebase with the Google credential.
+    await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
   /// Show an error message to the user.
   void showError({required BuildContext context, required String message}) {
     // Hide the previous snackbar.
@@ -212,7 +229,7 @@ class _LoginState extends State<Login> {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
                       ),
-                      onPressed: () {},
+                      onPressed: () => signInWithGoogle(context: context),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
