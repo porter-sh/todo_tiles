@@ -19,8 +19,9 @@ paths:
     get:
       tags:
         - users
-      summary: Get a user
-      description: Returns a user
+      operationId: getUserById
+      summary: Get a user by id
+      description: Returns a user by id
       parameters:
         - name: userId
           in: path
@@ -48,15 +49,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /users/{userId}/tasks:
+  /tasks:
     get:
       tags:
         - tasks
+      operationId: getTasks
       summary: Get all tasks of a user filtered by a category
       description: Returns a list of tasks that belong to a user and match a given category
       parameters:
         - name: userId
-          in: path
+          in: query
           required: true
           description: The id of the user
           schema:
@@ -90,23 +92,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /users/{userId}/tasks/{taskId}:
+  /tasks/{taskId}:
     get:
       tags:
         - tasks
-      summary: Get a task of a user
-      description: Returns a task that belongs to a user
+      operationId: getTaskById
+      summary: Get a task by id
+      description: Returns a task by id
       parameters:
-        - name: userId
-          in: path
-          required: true
-          description: The id of the user
-          schema:
-            type: integer
         - name: taskId
           in: path
           required: true
           description: The id of the task
+          schema:
+            type: integer
+        - name: userId
+          in: query
+          required: true
+          description: The id of the user
           schema:
             type: integer
       responses:
@@ -129,15 +132,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /users/{userId}/categories:
+  /categories:
     get:
       tags:
         - categories
+      operationId: getCategories
       summary: Get all categories of a user
       description: Returns a list of categories that belong to a user
       parameters:
         - name: userId
-          in: path
+          in: query
           required: true
           description: The id of the user
           schema:
@@ -164,23 +168,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
 
-  /users/{userId}/categories/{categoryId}:
+  /categories/{categoryId}:
     get:
       tags:
         - categories
-      summary: Get a category of a user
-      description: Returns a category that belongs to a user
+      operationId: getCategoryById
+      summary: Get a category by id
+      description: Returns a category by id
       parameters:
-        - name: userId
-          in: path
-          required: true
-          description: The id of the user
-          schema:
-            type: integer
         - name: categoryId
           in: path
           required: true
           description: The id of the category
+          schema:
+            type: integer
+        - name: userId
+          in: query
+          required: true
+          description: The id of the user
           schema:
             type: integer
       responses:
