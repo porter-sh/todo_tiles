@@ -1,0 +1,12 @@
+com.example.todo_tiles.app-jetified-window-1.0.0-beta04-0 /Users/porter/.gradle/caches/transforms-3/25cee5f028ac2a6b79fd6278ff5b59e2/transformed/jetified-window-1.0.0-beta04/res
+com.example.todo_tiles.app-jetified-annotation-experimental-1.1.0-1 /Users/porter/.gradle/caches/transforms-3/6c0c163cc77ae6c91f9f7dfcd179c29c/transformed/jetified-annotation-experimental-1.1.0/res
+com.example.todo_tiles.app-core-1.6.0-2 /Users/porter/.gradle/caches/transforms-3/7e9df2ac2213a6bd3cef0f2f27870d79/transformed/core-1.6.0/res
+com.example.todo_tiles.app-jetified-window-java-1.0.0-beta04-3 /Users/porter/.gradle/caches/transforms-3/ae81e06d24c799147c26814497a2a305/transformed/jetified-window-java-1.0.0-beta04/res
+com.example.todo_tiles.app-main-4 /Users/porter/dev/Projects/todo_tiles/android/app/src/main/res
+com.example.todo_tiles.app-profile-5 /Users/porter/dev/Projects/todo_tiles/android/app/src/profile/res
+com.example.todo_tiles.app-pngs-6 /Users/porter/dev/Projects/todo_tiles/build/app/generated/res/pngs/profile
+com.example.todo_tiles.app-resValues-7 /Users/porter/dev/Projects/todo_tiles/build/app/generated/res/resValues/profile
+com.example.todo_tiles.app-rs-8 /Users/porter/dev/Projects/todo_tiles/build/app/generated/res/rs/profile
+com.example.todo_tiles.app-mergeProfileResources-9 /Users/porter/dev/Projects/todo_tiles/build/app/intermediates/incremental/profile/mergeProfileResources/merged.dir
+com.example.todo_tiles.app-mergeProfileResources-10 /Users/porter/dev/Projects/todo_tiles/build/app/intermediates/incremental/profile/mergeProfileResources/stripped.dir
+com.example.todo_tiles.app-merged_res-11 /Users/porter/dev/Projects/todo_tiles/build/app/intermediates/merged_res/profile

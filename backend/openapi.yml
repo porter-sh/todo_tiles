@@ -1,0 +1,279 @@
+openapi: 3.0.2
+info:
+  title: Todo Tiles API
+  description: This is the API for the Todo Tiles app.
+  contact:
+    email: portershawver@gmail.com
+  version: 1.0.0
+servers:
+  - url: https://localhost:8080/v1
+tags:
+  - name: users
+    description: Everything related directly to users.
+  - name: tasks
+    description: Everything related to Tasks.
+  - name: categories
+    description: Everything related to Categories.
+paths:
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: Get a user
+      description: Returns a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user
+          schema:
+            type: integer
+      responses:
+        200:
+          description: A user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /users/{userId}/tasks:
+    get:
+      tags:
+        - tasks
+      summary: Get all tasks of a user filtered by a category
+      description: Returns a list of tasks that belong to a user and match a given category
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user
+          schema:
+            type: integer
+        - name: $ref
+          in: query
+          required: true
+          description: The reference to a category resource
+          schema:
+            type: string
+            format: uri
+      responses:
+        200:
+          description: A list of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/task"
+        400:
+          description: Invalid input or reference
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: User or category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /users/{userId}/tasks/{taskId}:
+    get:
+      tags:
+        - tasks
+      summary: Get a task of a user
+      description: Returns a task that belongs to a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: The id of the task
+          schema:
+            type: integer
+      responses:
+        200:
+          description: A task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: User or task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /users/{userId}/categories:
+    get:
+      tags:
+        - categories
+      summary: Get all categories of a user
+      description: Returns a list of categories that belong to a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user
+          schema:
+            type: integer
+      responses:
+        200:
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/category"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /users/{userId}/categories/{categoryId}:
+    get:
+      tags:
+        - categories
+      summary: Get a category of a user
+      description: Returns a category that belongs to a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user
+          schema:
+            type: integer
+        - name: categoryId
+          in: path
+          required: true
+          description: The id of the category
+          schema:
+            type: integer
+      responses:
+        200:
+          description: A category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/category"
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: User or category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          example: "John"
+        email:
+          type: string
+          example: "example@domain.com"
+
+    task:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          example: "Buy groceries"
+        description:
+          type: string
+          example: "Milks, eggs, bread, and cereal"
+        category:
+          type: string
+          example: "Chores"
+        due_date:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        creation_date:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        completion_date:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+      required:
+        - name
+        - creation_date
+
+    category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          example: "Chores"
+        description:
+          type: string
+          example: "Things that need to be done around the house"
+        creation_date:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+      required:
+        - name
+        - creation_date
+
+    error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

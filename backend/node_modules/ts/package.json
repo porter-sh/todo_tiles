@@ -1,0 +1,27 @@
+{
+  "name": "ts",
+  "version": "0.0.0",
+  "description": "Humanify unix timestamps",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "ts": "./bin/ts.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/juliangruber/ts.git"
+  },
+  "keywords": [
+    "unix",
+    "timestamp",
+    "ts",
+    "convert"
+  ],
+  "author": "Julian Gruber <julian@juliangruber.com>",
+  "license": "MIT",
+  "dependencies": {
+    "span": "~0.0.5"
+  }
+}
