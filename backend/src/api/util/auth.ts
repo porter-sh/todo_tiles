@@ -18,7 +18,8 @@ function tokenIsValid(token: string | undefined) {
 
 // Middleware to verify the user with firebase.
 export default function verifyUser(req: Request, res: Response, next: NextFunction) {
-    const token = req.get('Auth');
+    const token = req.get('Authorization');
+    console.log(token);
 
     if (!tokenIsValid(token)) {
         res.status(401).send('Invalid token.');

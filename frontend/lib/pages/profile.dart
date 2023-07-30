@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_tiles/components/icon_text.dart';
 
+import '../util/api.dart';
+
 class ProfilePage extends StatelessWidget {
   ProfilePage({super.key});
 
@@ -17,6 +19,21 @@ class ProfilePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text("Logged in as ${user.email}"),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () async {
+              var response = API.get(
+                path: 'users/${user.uid}',
+                authToken: await accessToken,
+              );
+              print(await response);
+            },
+            child: const IconText(
+              icon: Icon(Icons.api),
+              text: Text("Test API"),
+              padding: EdgeInsets.all(10),
+            ),
+          ),
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {

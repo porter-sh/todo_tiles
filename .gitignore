@@ -1,8 +1,9 @@
 # Miscellaneous
 .vscode/
-*Key.json
 build/
-abuild/
+*.cert
+*.key
+*Key.json
 
 # Backend related
 package-lock.json
@@ -40,7 +41,6 @@ migrate_working_dir/
 .packages
 .pub-cache/
 .pub/
-/build/
 
 # Symbolication related
 app.*.symbols
