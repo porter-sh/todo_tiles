@@ -1,7 +1,0 @@
-#Fri Jul 28 14:14:02 CDT 2023
-base.0=/Users/porter/dev/Projects/Todo_Tiles/todo_tiles/frontend/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
-base.1=/Users/porter/dev/Projects/Todo_Tiles/todo_tiles/frontend/build/app/intermediates/dex/debug/mergeDexDebug/classes2.dex
-path.0=classes.dex
-path.1=classes2.dex
-renamed.0=classes.dex
-renamed.1=classes2.dex
