@@ -6,7 +6,7 @@ info:
     email: portershawver@gmail.com
   version: 1.0.0
 servers:
-  - url: https://localhost:8080/v1
+  - url: https://localhost:8080
 tags:
   - name: users
     description: Everything related directly to users.

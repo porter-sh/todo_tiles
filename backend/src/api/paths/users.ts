@@ -9,6 +9,7 @@ export const usersRouter = express.Router();
  * Returns a user
  */
 usersRouter.get('/:id', (req: Request, res: Response) => {
-    users.getUserById(req.params.id);
+    let new_id: string = users.getUserById(req.params.id);
+    res.send(new_id);
 });
 

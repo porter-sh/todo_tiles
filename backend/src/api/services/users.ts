@@ -1,3 +1,3 @@
-module.exports.getUserById = () => {
-    // TODO
+module.exports.getUserById = (param: string) => {
+    return `Hello ${param}!`;
 }

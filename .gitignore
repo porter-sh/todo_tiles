@@ -1,5 +1,6 @@
 # Miscellaneous
 .vscode/
+*Key.json
 
 # Backend related
 package-lock.json
