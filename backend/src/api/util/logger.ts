@@ -17,28 +17,20 @@ class ColorConsoleTrasport extends Transport {
         });
 
         const color = Colors[info.level as keyof typeof Colors];
+        const timestamp = new Date().toISOString().substring(11, 19); // get the current timestamp in ISO format
         if (color) {
-            console.log(color, info.message);
+            console.log(`\x1b[90m[${timestamp}] ${color}${info.level}\x1b[0m: ${info.message}`); // add the timestamp before the level
         } else {
-            console.log(info.message);
+            console.log(`${timestamp} ${info.message}`); // add the timestamp before the message
         }
 
         callback();
     }
-}
 
-// Logger format
-const format = winston.format.printf(
-    (info: winston.Logform.TransformableInfo) => {
-        return `[${info.timestamp}] ${info.level.toUpperCase()}: ${info.message}`;
-    });
+}
 
 const logger = winston.createLogger({
     level: 'debug',
-    format: winston.format.combine(
-        winston.format.timestamp({ format: 'HH:mm:ss' }),
-        format
-    ),
     transports: [new ColorConsoleTrasport()],
 });
 
