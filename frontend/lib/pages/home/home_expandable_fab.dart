@@ -24,16 +24,18 @@ class HomeExpandableFab extends StatelessWidget {
       // Grey out the background when the FAB is expanded.
       overlayStyle: ExpandableFabOverlayStyle(
           color: Theme.of(context).colorScheme.scrim.withOpacity(0.15)),
-      // Button to close the expanded menu.
-      closeButtonStyle: ExpandableFabCloseButtonStyle(
-        child: const Icon(Icons.close),
-        foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
-        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-      ),
       // Button to open the expanded menu.
-      child: const Icon(Icons.add),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      openButtonBuilder: RotateFloatingActionButtonBuilder(
+        child: const Icon(Icons.add),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
+      // Button to close the expanded menu.
+      closeButtonBuilder: RotateFloatingActionButtonBuilder(
+        child: const Icon(Icons.close),
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+      ),
       // The buttons in the FAB.
       children: [
         ExpandedFabButton(
