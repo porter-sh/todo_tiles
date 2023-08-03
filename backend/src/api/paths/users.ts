@@ -14,7 +14,12 @@ usersRouter.get('/:id', (req: Request, res: Response) => {
 
     logger.http(`GET /users/${id}`);
 
-    let new_id: string = users.getUserById(id);
-    res.send(new_id);
+    if (id != req.decodedFirebaseToken.uid) {
+        logger.warn(`Client requested user [${id}] but is authenticated with [${req.decodedFirebaseToken.uid}].`);
+
+        throw new Error('Authentication token does not match user id.');
+    }
+
+    res.send(`Hello ${id}!`);
 });
 

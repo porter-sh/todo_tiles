@@ -13,7 +13,7 @@ const auth = getAuth(firebaseApp);
 // Middleware to verify the user with firebase.
 export default async function verifyUser(req: Request, res: Response, next: NextFunction) {
     const token = req.get('Authorization');
-
+    logger.debug(`Authenticating with token ${token}.`);
 
     if (token === undefined || token.length === 0) {
         logger.warn(`Client did not provide authentication token.`);
@@ -22,11 +22,11 @@ export default async function verifyUser(req: Request, res: Response, next: Next
     }
 
     try {
-        const decodedToken = await auth.verifyIdToken(token!);
-        const uid = decodedToken.uid;
-        logger.info(`Client is authenticated with uid ${uid}.`);
+        req.decodedFirebaseToken = await auth.verifyIdToken(token!);
+        const uid = req.decodedFirebaseToken.uid;
+        logger.info(`Client is authenticated with uid [${uid}].`);
     } catch (error) {
-        logger.error(`Authentication error for token ${token}: \n${error}`);
+        logger.error(`Authentication error for token [${token}]: \n${error}`);
 
         return next(error);
     }
