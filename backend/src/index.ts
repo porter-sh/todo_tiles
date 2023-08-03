@@ -1,4 +1,5 @@
 import verifyUser from './api/util/auth';
+import logger from './api/util/logger';
 
 const https = require('https');
 const fs = require('fs');
@@ -18,4 +19,4 @@ const certificate = fs.readFileSync('server.cert', 'utf8');
 const server = https.createServer({ key: privateKey, cert: certificate }, app);
 
 // Listen to the HTTPS server
-server.listen(PORT, () => console.log(`Server is running on port ${PORT}.`));
+server.listen(PORT, () => logger.info(`Server is running on port ${PORT}.`));

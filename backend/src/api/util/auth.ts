@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import { getAuth } from 'firebase-admin/auth';
 import admin from 'firebase-admin';
+import logger from './logger';
 
 const serviceAccountCreds = require('../../../serviceAccountKey.json');
 const firebaseApp = admin.initializeApp({
@@ -19,11 +20,11 @@ function tokenIsValid(token: string | undefined) {
 // Middleware to verify the user with firebase.
 export default function verifyUser(req: Request, res: Response, next: NextFunction) {
     const token = req.get('Authorization');
-    console.log(token);
+
 
     if (!tokenIsValid(token)) {
         res.status(401).send('Invalid token.');
-        console.log('Invalid token.');
+        logger.warn(`Client tried to authenticate with invalid token: ${token}.`);
         return;
     }
 
@@ -31,10 +32,11 @@ export default function verifyUser(req: Request, res: Response, next: NextFuncti
         .verifyIdToken(token!)
         .then((decodedToken: DecodedIdToken) => {
             const uid = decodedToken.uid;
-            console.log(uid);
+            logger.info(`Client is authenticated with uid ${uid}.`);
         })
         .catch((error: any) => {
-            console.log(error);
+            res.status(401).send('Invalid token.');
+            logger.error(`Authentication error for token ${token}: ${error}`);
         });
 
 
