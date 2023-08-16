@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier';
 import { getAuth } from 'firebase-admin/auth';
 import admin from 'firebase-admin';
-import logger from './logger';
+import logger from '../../logger';
 
 const serviceAccountCreds = require('../../../serviceAccountKey.json');
 const firebaseApp = admin.initializeApp({

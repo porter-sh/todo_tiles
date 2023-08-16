@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import logger from '../util/logger';
+import logger from '../../logger';
 
 const express = require('express');
-const users = require('../services/users');
 
 export const usersRouter = express.Router();
 

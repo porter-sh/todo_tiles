@@ -91,15 +91,12 @@ class _LoginState extends State<Login> {
 
     // Try to create a new account with the email and password.
     try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
-      )
-          .then((value) {
-        // Hide the loading circle.
-        Navigator.pop(context);
-      });
+      );
+      // Hide the loading circle.
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       // Hide the loading circle.
       Navigator.pop(context);

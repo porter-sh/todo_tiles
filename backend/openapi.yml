@@ -57,19 +57,35 @@ paths:
       summary: Get all tasks of a user filtered by a category
       description: Returns a list of tasks that belong to a user and match a given category
       parameters:
-        - name: userId
+        - name: categoryId
           in: query
-          required: true
-          description: The id of the user
+          required: false
+          description: The id of the category.
           schema:
             type: integer
-        - name: $ref
+        - name: filter
           in: query
-          required: true
-          description: The reference to a category resource
+          required: false
+          description: The filter to apply to the tasks.
           schema:
             type: string
-            format: uri
+            enum:
+              - all
+              - completed
+              - incomplete
+              - overdue
+              - upcoming
+        - name: timeHorizon
+          in: query
+          required: false
+          description: The time horizon to apply to the tasks.
+          schema:
+            type: string
+            enum:
+              - all
+              - day
+              - week
+              - month
       responses:
         200:
           description: A list of tasks
