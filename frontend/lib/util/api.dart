@@ -4,15 +4,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import '../backend_address.dart';
+
 /// The http wrapper class that is used to make http requests to the backend.
 class API {
   /// The http client.
   static final client = HttpClient()
     ..badCertificateCallback =
         ((X509Certificate cert, String host, int port) => true);
-
-  /// The base url of the backend.
-  static const baseUrl = '192.168.0.21:8080';
 
   /// Get request to the API.
   static Future<dynamic> get({required String path, String? authToken}) async {

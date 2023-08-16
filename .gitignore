@@ -4,6 +4,7 @@ build/
 *.cert
 *.key
 *Key.json
+backend_address.dart
 
 # Backend related
 package-lock.json
