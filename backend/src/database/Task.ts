@@ -1,6 +1,6 @@
 export default class Task {
     public id: number;
-    public userId: number;
+    public userId: string;
     public categoryId: number | null;
     public name: string;
     public description: string | null;
@@ -8,7 +8,7 @@ export default class Task {
     public dueDate: string | null;
     public completionDate: string | null;
 
-    constructor(id: number, userId: number, categoryId: number | null,
+    constructor(id: number, userId: string, categoryId: number | null,
         name: string, description: string | null, creationDate: string,
         dueDate: string | null, completionDate: string | null) {
         this.id = id;
@@ -41,8 +41,8 @@ export default class Task {
             name: this.name,
             description: this.description,
             creation_date: this.creationDate,
-            dueDate: this.dueDate,
-            completionDate: this.completionDate
+            due_date: this.dueDate,
+            completion_date: this.completionDate
         };
     }
 }

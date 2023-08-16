@@ -139,6 +139,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+    put:
+      tags:
+        - tasks
+      operationId: updateTask
+      summary: Update a task
+      description: Updates a task
+      requestBody:
+        description: The task to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
+      responses:
+        200:
+          description: The updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+        400:
+          description: Invalid input or reference
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: User or category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
 
   # /tasks/{taskId}:
   #   get:

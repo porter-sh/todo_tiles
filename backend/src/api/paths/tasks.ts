@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import logger from '../../logger';
 import Database from '../../database/Database';
+import Task from '../../database/Task';
 
 const express = require('express');
 
@@ -46,6 +47,40 @@ tasksRouter.post('/', async (req: Request, res: Response) => {
     logger.http(`POST /tasks, body: ${JSON.stringify(req.body)}`);
 
     let newTask = await Database.createTask(userId, name, categoryId, description, dueDate, completionDate);
+
+    res.send(newTask.toJSON());
+});
+
+/**
+ * Updates a task for the current user.
+ */
+tasksRouter.put('/', async (req: Request, res: Response) => {
+    const userId = req.decodedFirebaseToken.uid;
+
+    logger.http(`PUT /tasks, body: ${JSON.stringify(req.body)}`);
+
+    let updatedTask: Task;
+    try {
+        updatedTask = new Task(parseInt(req.body.id),
+            req.body.user_id, parseInt(req.body.category_id),
+            req.body.name, req.body.description, req.body.creation_date,
+            req.body.due_date, req.body.completion_date);
+
+        logger.debug(`Parsed task: ${updatedTask.toString()}`);
+    } catch (e) {
+        logger.warn(`Failed to parse task: ${e}`);
+
+        res.sendStatus(400);
+        return;
+    }
+
+    if (userId !== updatedTask.userId) {
+        logger.warn(`User [${userId}] attempted to update task [${updatedTask.id}] owned by user [${updatedTask.userId}].`);
+        res.sendStatus(403);
+        return;
+    }
+
+    let newTask = await Database.updateTask(updatedTask);
 
     res.send(newTask.toJSON());
 });

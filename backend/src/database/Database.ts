@@ -243,5 +243,34 @@ export default class Database {
             return Database.getTask(id as number);
         });
     }
+
+    /**
+     * Update a task.
+     * @param task The updated version of the task. The id is invariant.
+     * @returns A promise that resolves when the task is updated.
+     */
+    public static updateTask(task: Task): Promise<Task> {
+        logger.debug(`Updating task [${task.toString()}].`);
+
+        return new Promise<void>((resolve, reject) => {
+            let sql = `UPDATE tasks SET category_id = ?, name = ?, description = ?, due_date = ?, completion_date = ? WHERE id = ?`;
+            let params = [task.categoryId, task.name, task.description,
+            task.dueDate, task.completionDate, task.id];
+
+            logger.debug(`SQL: ${sql}, params: [${params}]`);
+
+            Database.db.run(sql, params, (err) => {
+                if (err) {
+                    logger.error(`Error updating task: ${err}`);
+                    reject(err);
+                } else {
+                    logger.debug(`Updated task.`);
+                    resolve();
+                }
+            });
+        }).then(() => {
+            return Database.getTask(task.id);
+        });
+    }
 }
 
