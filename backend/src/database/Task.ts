@@ -28,4 +28,21 @@ export default class Task {
         return new Task(row.id, row.user_id, row.category_id, row.name,
             row.description, row.creation_date, row.due_date, row.completion_date);
     }
+
+    public toString(): string {
+        return `Task [id=${this.id}, userId=${this.userId}, categoryId=${this.categoryId}, name=${this.name}, description=${this.description}, creationDate=${this.creationDate}, dueDate=${this.dueDate}, completionDate=${this.completionDate}]`;
+    }
+
+    public toJSON(): any {
+        return {
+            id: this.id,
+            user_id: this.userId,
+            category_id: this.categoryId,
+            name: this.name,
+            description: this.description,
+            creation_date: this.creationDate,
+            dueDate: this.dueDate,
+            completionDate: this.completionDate
+        };
+    }
 }

@@ -4,7 +4,8 @@ import Database from './database/Database';
 
 const https = require('https');
 const fs = require('fs');
-const app = require('express')();
+const express = require('express');
+const app = express();
 const PORT = 8080;
 
 const { usersRouter } = require('./api/paths/users');
@@ -12,6 +13,9 @@ const { tasksRouter } = require('./api/paths/tasks');
 
 // Initialize the database
 const db = new Database();
+
+// Enable JSON parsing
+app.use(express.json());
 
 app.use(verifyUser);
 app.use('/users', usersRouter);

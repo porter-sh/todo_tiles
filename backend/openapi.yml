@@ -107,112 +107,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
-  /tasks/{taskId}:
-    get:
+    post:
       tags:
         - tasks
-      operationId: getTaskById
-      summary: Get a task by id
-      description: Returns a task by id
-      parameters:
-        - name: taskId
-          in: path
-          required: true
-          description: The id of the task
-          schema:
-            type: integer
-        - name: userId
-          in: query
-          required: true
-          description: The id of the user
-          schema:
-            type: integer
+      operationId: createTask
+      summary: Create a task
+      description: Creates a task
+      requestBody:
+        description: The task to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/task"
       responses:
-        200:
-          description: A task
+        201:
+          description: The created task
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/task"
         400:
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error"
-        404:
-          description: User or task not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error"
-
-  /categories:
-    get:
-      tags:
-        - categories
-      operationId: getCategories
-      summary: Get all categories of a user
-      description: Returns a list of categories that belong to a user
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: The id of the user
-          schema:
-            type: integer
-      responses:
-        200:
-          description: A list of categories
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/category"
-        400:
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error"
-        404:
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/error"
-
-  /categories/{categoryId}:
-    get:
-      tags:
-        - categories
-      operationId: getCategoryById
-      summary: Get a category by id
-      description: Returns a category by id
-      parameters:
-        - name: categoryId
-          in: path
-          required: true
-          description: The id of the category
-          schema:
-            type: integer
-        - name: userId
-          in: query
-          required: true
-          description: The id of the user
-          schema:
-            type: integer
-      responses:
-        200:
-          description: A category
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/category"
-        400:
-          description: Invalid input
+          description: Invalid input or reference
           content:
             application/json:
               schema:
@@ -223,6 +139,122 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+
+  # /tasks/{taskId}:
+  #   get:
+  #     tags:
+  #       - tasks
+  #     operationId: getTaskById
+  #     summary: Get a task by id
+  #     description: Returns a task by id
+  #     parameters:
+  #       - name: taskId
+  #         in: path
+  #         required: true
+  #         description: The id of the task
+  #         schema:
+  #           type: integer
+  #       - name: userId
+  #         in: query
+  #         required: true
+  #         description: The id of the user
+  #         schema:
+  #           type: integer
+  #     responses:
+  #       200:
+  #         description: A task
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/task"
+  #       400:
+  #         description: Invalid input
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/error"
+  #       404:
+  #         description: User or task not found
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/error"
+
+  # /categories:
+  #   get:
+  #     tags:
+  #       - categories
+  #     operationId: getCategories
+  #     summary: Get all categories of a user
+  #     description: Returns a list of categories that belong to a user
+  #     parameters:
+  #       - name: userId
+  #         in: query
+  #         required: true
+  #         description: The id of the user
+  #         schema:
+  #           type: integer
+  #     responses:
+  #       200:
+  #         description: A list of categories
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: "#/components/schemas/category"
+  #       400:
+  #         description: Invalid input
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/error"
+  #       404:
+  #         description: User not found
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/error"
+
+  # /categories/{categoryId}:
+  #   get:
+  #     tags:
+  #       - categories
+  #     operationId: getCategoryById
+  #     summary: Get a category by id
+  #     description: Returns a category by id
+  #     parameters:
+  #       - name: categoryId
+  #         in: path
+  #         required: true
+  #         description: The id of the category
+  #         schema:
+  #           type: integer
+  #       - name: userId
+  #         in: query
+  #         required: true
+  #         description: The id of the user
+  #         schema:
+  #           type: integer
+  #     responses:
+  #       200:
+  #         description: A category
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/category"
+  #       400:
+  #         description: Invalid input
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/error"
+  #       404:
+  #         description: User or category not found
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/error"
 
 components:
   schemas:
@@ -251,9 +283,9 @@ components:
         description:
           type: string
           example: "Milks, eggs, bread, and cereal"
-        category:
-          type: string
-          example: "Chores"
+        category_id:
+          type: number
+          example: 1
         due_date:
           type: string
           format: date-time

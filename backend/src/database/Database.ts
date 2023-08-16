@@ -145,10 +145,10 @@ export default class Database {
      * @param timeHorizon How far into the future to look for tasks.
      * @returns A promise that resolves to an array of tasks.
      */
-    public static getTasks(userId: number, categoryId?: number,
+    public static getTasks(userId: string, categoryId?: number,
         filter?: TaskFilter,
         timeHorizon?: TimeHorizon): Promise<Task[]> {
-        logger.debug(`Getting tasks for user [${userId}], with category [${categoryId}], filter [${filter?.displayString}], and time horizon [${timeHorizon?.displayString}].]`);
+        logger.debug(`Getting tasks for user [${userId}], with category [${categoryId}], filter [${filter?.displayString}], and time horizon [${timeHorizon?.displayString}].`);
 
         return new Promise((resolve, reject) => {
             let sql = `SELECT * FROM tasks WHERE user_id = ?`;
@@ -156,7 +156,7 @@ export default class Database {
 
             if (categoryId) {
                 sql += ` AND category_id = ?`;
-                params.push(categoryId);
+                params.push(categoryId.toString());
             }
 
             if (filter !== undefined && filter.sqlString.length > 0) {
@@ -181,6 +181,66 @@ export default class Database {
                     resolve(res);
                 }
             });
+        });
+    }
+
+    /**
+     * Get a task by id.
+     * @param id The task id.
+     * @returns A promise that resolves to the task.
+    */
+    public static getTask(id: number): Promise<Task> {
+        logger.debug(`Getting task with id [${id}].`);
+
+        return new Promise((resolve, reject) => {
+            let sql = `SELECT * FROM tasks WHERE id = ?`;
+
+            logger.debug(`SQL: ${sql}, params: [${id}]`);
+
+            Database.db.get(sql, [id], (err, row) => {
+                if (err) {
+                    logger.error(`Error getting task: ${err}`);
+                    reject(err);
+                } else {
+                    let res = Task.fromRow(row);
+                    logger.debug(`Found task: ${res.toString()}`);
+                    resolve(res);
+                }
+            });
+        });
+    }
+
+    /**
+     * Create a new task.
+     * @param userId The user id.
+     * @param categoryId The category id.
+     * @param name The task name.
+     * @param description The task description.
+     * @param dueDate The task due date.
+     * @returns A promise that resolves to the new task.
+     */
+    public static createTask(userId: string, name: string, categoryId?: number,
+        description?: string, dueDate?: Date, completionDate?: Date):
+        Promise<Task> {
+        logger.debug(`Creating task for user [${userId}], with category [${categoryId}], name [${name}], description [${description}], due date [${dueDate}], and completion date [${completionDate}].`);
+
+        return new Promise((resolve, reject) => {
+            let sql = `INSERT INTO tasks (user_id, category_id, name, description, creation_date, due_date) VALUES (?, ?, ?, ?, datetime('now'), ?)`;
+            let params = [userId, categoryId, name, description, dueDate];
+
+            logger.debug(`SQL: ${sql}, params: [${params}]`);
+
+            Database.db.run(sql, params, function (err) {
+                if (err) {
+                    logger.error(`Error creating task: ${err}`);
+                    reject(err);
+                } else {
+                    logger.debug(`Created task with id [${this.lastID}].`);
+                    resolve(this.lastID);
+                }
+            });
+        }).then((id) => {
+            return Database.getTask(id as number);
         });
     }
 }

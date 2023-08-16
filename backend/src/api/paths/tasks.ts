@@ -7,9 +7,9 @@ const express = require('express');
 export const tasksRouter = express.Router();
 
 /**
- * Returns a user
+ * Returns all tasks for the current user that match the given filters.
  */
-tasksRouter.get('/', (req: Request, res: Response) => {
+tasksRouter.get('/', async (req: Request, res: Response) => {
     const userId = req.decodedFirebaseToken.uid;
     const categoryId = req.query.categoryId;
     const filter = req.query.filter;
@@ -26,9 +26,26 @@ tasksRouter.get('/', (req: Request, res: Response) => {
     const parsedTimeHorizon = Database.TimeHorizon.fromString(
         timeHorizon as string || 'all');
 
-    let tasks = Database.getTasks(userId, parsedCategoryId, parsedFilter,
+    let tasks = await Database.getTasks(userId, parsedCategoryId, parsedFilter,
         parsedTimeHorizon);
 
-    res.send(tasks);
+    res.send(tasks.map((task) => task.toJSON()));
 });
 
+/**
+ * Creates a new task for the current user.
+ */
+tasksRouter.post('/', async (req: Request, res: Response) => {
+    const userId = req.decodedFirebaseToken.uid;
+    const name = req.body.name;
+    const categoryId = req.body.category_id;
+    const description = req.body.description;
+    const dueDate = req.body.due_date;
+    const completionDate = req.body.completion_date;
+
+    logger.http(`POST /tasks, body: ${JSON.stringify(req.body)}`);
+
+    let newTask = await Database.createTask(userId, name, categoryId, description, dueDate, completionDate);
+
+    res.send(newTask.toJSON());
+});
