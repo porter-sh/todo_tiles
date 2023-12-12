@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../task_data.dart';
-import '../../types/task.dart';
+import '../../types/backend_task.dart';
 import './task_tile_info_dialog.dart';
 
 /// Public class [TaskTile] is a [StatelessWidget] that displays a task as a
@@ -16,17 +16,17 @@ class TaskTile extends StatelessWidget {
   /// Creates a [TaskTile] widget.
   const TaskTile({
     super.key,
-    required this.taskIndex,
+    required this.taskId,
   });
 
   /// The index of the task to display.
-  final int taskIndex;
+  final int taskId;
 
   /// Returns the widget that displays the task as a tile.
   @override
   Widget build(BuildContext context) {
     TaskData taskData = context.watch<TaskData>();
-    final Task task = taskData.tasks[taskIndex];
+    final BackendTask task = taskData.getTaskById(taskId);
 
     ButtonStyle notCompletedStyle = ElevatedButton.styleFrom(
       foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -45,16 +45,15 @@ class TaskTile extends StatelessWidget {
     return ElevatedButton(
       style: task.isCompleted ? isCompletedStyle : notCompletedStyle,
       onPressed: () {
-        taskData.toggleTaskCompleted(taskIndex);
+        taskData.toggleTaskCompleted(taskId);
       },
       onLongPress: () => showDialog<String>(
         context: context,
-        builder: (BuildContext context) =>
-            TaskTileInfoDialog(taskIndex: taskIndex),
+        builder: (BuildContext context) => TaskTileInfoDialog(taskId: taskId),
       ),
       child: Column(
         children: [
-          Text(task.name),
+          Text(task.name ?? ''),
           Text(task.creationDate.toString()),
         ],
       ),

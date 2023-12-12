@@ -5,82 +5,32 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 
 import 'types/category.dart';
-import 'types/task.dart';
+import 'types/backend_task.dart';
+import 'types/completion_filter.dart';
+import 'types/time_horizon.dart';
+import 'util/api.dart';
 
 /// Public class [TaskData] is a [ChangeNotifier] that stores the data for the
 /// app.
 class TaskData with ChangeNotifier {
-  /// Constructor to initialize the database connection.
+  /// Update the data at the beginning to reflect the database.
   TaskData() {
-    _initDatabase();
+    syncTasksFromBackend();
   }
 
-  /// The database connection.
-  late final Database _database;
+  /// The category for the current view.
+  Category? _categoryFilter;
 
-  /// Initialize the database connection.
-  Future<void> _initDatabase() async {
-    final Future<Database> database = openDatabase(
-      join(await getDatabasesPath(), 'todo_database.db'),
-      onCreate: (db, version) {
-        // Create the tasks table with columns for all Task fields.
-        db.execute(
-          '''CREATE TABLE tasks(
-            id INTEGER PRIMARY KEY,
-            name TEXT,
-            description TEXT,
-            category TEXT,
-            dueDate TEXT,
-            creationDate TEXT,
-            completionDate TEXT
-          )''',
-        );
-        // Create the categories table with columns for all Category fields.
-        db.execute(
-          '''CREATE TABLE categories(
-            id INTEGER PRIMARY KEY,
-            name TEXT,
-            description TEXT,
-            color TEXT
-          )''',
-        );
-      },
-      version: 1,
-    );
+  /// The completion filter for the current view.
+  CompletionFilter? _completionFilter;
 
-    _database = await database;
-
-    // Load the categories from the database.
-    final List<Map<String, dynamic>> categoryMaps =
-        await _database.query('categories');
-    _categories = categoryMaps
-        .map((categoryMap) => Category.fromMap(categoryMap))
-        .toList();
-
-    // Load the tasks from the database.
-    final List<Map<String, dynamic>> taskMaps = await _database.query('tasks');
-    // Change the category field of each map from a string to the corresponding
-    // Category object from _categories if it exists. Otherwise, use
-    // Category.none.
-    _tasks = taskMaps
-        .map((taskMap) => Task.fromMap(
-              taskMap,
-              _categories.firstWhere(
-                (category) => category.name == taskMap['category'],
-                orElse: () => Category.none,
-              ),
-            ))
-        .toList();
-
-    notifyListeners();
-  }
+  /// The time horizon for the current view.
+  TimeHorizon? _timeHorizonFilter;
 
   /// The list of user-created task categories.
-  List<Category> _categories = [];
+  final List<Category> _categories = [];
 
   /// Returns only the list of categories that have been created by the user.
   UnmodifiableListView<Category> get userCategories =>
@@ -102,12 +52,6 @@ class TaskData with ChangeNotifier {
   void addCategory(Category category) {
     if (!_categories.contains(category)) {
       _categories.add(category);
-      // Update the database.
-      _database.insert(
-        'categories',
-        category.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
       notifyListeners();
     }
   }
@@ -116,12 +60,6 @@ class TaskData with ChangeNotifier {
   void removeCategory(Category category) {
     if (_categories.contains(category)) {
       _categories.remove(category);
-      // Update the database.
-      _database.delete(
-        'categories',
-        where: 'name = ?',
-        whereArgs: [category.name],
-      );
       notifyListeners();
     }
   }
@@ -133,102 +71,110 @@ class TaskData with ChangeNotifier {
     addCategory(newCategory);
   }
 
-  /// The list of user-created tasks.
-  List<Task> _tasks = [];
+  /// The ids of the current tasks, mapped to their task.
+  Map<int, BackendTask> _tasks = {};
 
-  /// Returns the list of tasks that can't be changed, because that would
-  /// violate state.
-  UnmodifiableListView<Task> get tasks => UnmodifiableListView(_tasks);
-
-  /// Returns the number of tasks stored.
+  /// Get the number of currently displayed tasks.
   int get numTasks => _tasks.length;
 
+  /// Update the list of tasks to reflect the database.
+  void syncTasksFromBackend() async {
+    // Clear the list of tasks.
+    _tasks = {};
+
+    _tasks = await API.get(path: 'tasks', queryParameters: {
+      'categoryId': _categoryFilter?.backendRepresentation,
+      'filter': _completionFilter?.backendRepresentation,
+      'timeHorizon': _timeHorizonFilter?.backendRepresentation,
+    }).then((response) {
+      try {
+        response = response as List<dynamic>;
+      } catch (e) {
+        // Malformed response.
+        response = [];
+      }
+      // Convert the response to a map of tasks.
+      Map<int, BackendTask> tasks = {};
+      for (var taskMap in response) {
+        BackendTask task = BackendTask.fromJson(taskMap);
+        tasks[task.id!] = task;
+      }
+      return tasks;
+    });
+
+    notifyListeners();
+  }
+
+  BackendTask getTaskById(int id) => _tasks[id]!;
+
+  /// Get the id of a task by its index in the list of tasks.
+  int getTaskIdByIndex(int index) => _tasks.keys.elementAt(index);
+
   /// Add a task to the list of tasks if it is not already in the list.
-  void addTask(Task task) {
-    if (!_tasks.contains(task)) {
-      _tasks.add(task);
-      // Update the database.
-      _database.insert(
-        'tasks',
-        task.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      notifyListeners();
-    }
+  void addTask(BackendTask task) async {
+    // Send the new task to the database.
+    API.post(
+      path: 'tasks',
+      body: task.toJson(),
+    );
+
+    syncTasksFromBackend();
+    notifyListeners();
   }
 
-  /// Remove a task from the list of tasks.
-  void removeTask(int taskIndex) {
-    if (taskIndex < _tasks.length) {
-      // Update the database.
-      _database.delete(
-        'tasks',
-        where: 'id = ?',
-        whereArgs: [_tasks[taskIndex].hashCode],
-      );
-      // Remove the task from the list.
-      _tasks.removeAt(taskIndex);
-      notifyListeners();
+  /// Remove a task from the database.
+  void removeTask(BackendTask task) {
+    // Send the task to the database.
+    API.delete(path: 'tasks/${task.id}');
+
+    syncTasksFromBackend();
+    notifyListeners();
+  }
+
+  /// Modify a task in the list of tasks on the backend, then update the list of
+  /// tasks to reflect the database.
+  void modifyTask(BackendTask newTask) {
+    // Send the new task to the database.
+    API.put(
+      path: 'tasks/${newTask.id}',
+      body: newTask.toJson(),
+    );
+
+    syncTasksFromBackend();
+    notifyListeners();
+  }
+
+  /// Set a task to completed on the backend, then update the list of tasks.
+  void completeTask(BackendTask task) {
+    // Send the task to the database.
+    API.put(
+      path: 'tasks/${task.id}/complete',
+      body: task.toJson(),
+    );
+
+    syncTasksFromBackend();
+    notifyListeners();
+  }
+
+  /// Set a task to incomplete on the backend, then update the list of tasks.
+  void uncompleteTask(BackendTask task) {
+    // Send the task to the database.
+    API.put(
+      path: 'tasks/${task.id}/uncomplete',
+      body: task.toJson(),
+    );
+
+    syncTasksFromBackend();
+    notifyListeners();
+  }
+
+  /// Toggle whether a task is completed.
+  void toggleTaskCompleted(int taskId) {
+    BackendTask task = getTaskById(taskId);
+    if (task.isCompleted) {
+      uncompleteTask(task);
     } else {
-      throw Exception('Task index out of bounds.');
-    }
-  }
-
-  /// Modify a task in the list of tasks, by removing the old task and adding
-  /// the new task.
-  void modifyTask(int taskIndex, Task newTask) {
-    removeTask(taskIndex);
-    addTask(newTask);
-  }
-
-  /// Toggle if a task has been completed.
-  void toggleTaskCompleted(int taskIndex) {
-    if (taskIndex < _tasks.length) {
-      _tasks[taskIndex].toggleCompleted();
-      // Update the database.
-      _database.update(
-        'tasks',
-        _tasks[taskIndex].toMap(),
-        where: 'id = ?',
-        whereArgs: [taskIndex],
-      );
-      notifyListeners();
-    } else {
-      throw Exception('Task index out of bounds.');
-    }
-  }
-
-  /// Mark a task as complete.
-  void markTaskComplete(int taskIndex) {
-    if (taskIndex < _tasks.length) {
-      _tasks[taskIndex].markComplete();
-      // Update the database.
-      _database.update(
-        'tasks',
-        _tasks[taskIndex].toMap(),
-        where: 'id = ?',
-        whereArgs: [taskIndex],
-      );
-      notifyListeners();
-    } else {
-      throw Exception('Task index out of bounds.');
-    }
-  }
-
-  /// Mark a task as incomplete.
-  void markTaskIncomplete(int taskIndex) {
-    if (taskIndex < _tasks.length) {
-      _tasks[taskIndex].markIncomplete();
-      // Update the database.
-      _database.update(
-        'tasks',
-        _tasks[taskIndex].toMap(),
-        where: 'id = ?',
-        whereArgs: [taskIndex],
-      );
-      notifyListeners();
-    } else {
-      throw Exception('Task index out of bounds.');
+      completeTask(task);
     }
   }
 }

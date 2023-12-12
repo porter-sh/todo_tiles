@@ -10,7 +10,6 @@ class ProfilePage extends StatelessWidget {
   ProfilePage({super.key});
 
   final user = FirebaseAuth.instance.currentUser!;
-  final accessToken = FirebaseAuth.instance.currentUser!.getIdToken();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,6 @@ class ProfilePage extends StatelessWidget {
             onPressed: () async {
               var response = API.get(
                 path: 'users/${user.uid}',
-                authToken: await accessToken,
               );
               print(await response);
             },

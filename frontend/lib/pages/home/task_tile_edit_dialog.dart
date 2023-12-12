@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../task_data.dart';
-import '../../types/task.dart';
+import '../../types/backend_task.dart';
 import '../../types/category.dart';
+import '../../types/task.dart';
 
 /// Public class [TaskTileEditDialog] is a [StatefulWidget] that displays a
 /// fullscreen dialog that allows the user to edit a task.
@@ -14,11 +15,11 @@ class TaskTileEditDialog extends StatefulWidget {
   /// Creates a [TaskTileEditDialog] widget.
   const TaskTileEditDialog({
     super.key,
-    this.taskIndex,
+    this.taskId,
   });
 
-  /// The index of the task to edit. Null if the task is new.
-  final int? taskIndex;
+  /// The id of the task to edit. Null if the task is new.
+  final int? taskId;
 
   /// Returns the state of the [TaskTileEditDialog] widget.
   @override
@@ -28,17 +29,8 @@ class TaskTileEditDialog extends StatefulWidget {
 /// Private class [_TaskTileEditDialogState] is the state of the
 /// [TaskTileEditDialog] widget.
 class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
-  /// The new name of the task.
-  String? name;
-
-  /// The new description of the task.
-  String? description;
-
-  /// The new category of the task.
-  Category? category;
-
-  /// The new due date of the task.
-  DateTime? dueDate;
+  /// The new task.
+  Task task = Task();
 
   /// The form key for the form.
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -49,21 +41,16 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
     TaskData taskData = context.watch<TaskData>();
 
     // Update the text fields with the current values of the task.
-    if (widget.taskIndex != null) {
-      name ??= taskData.tasks[widget.taskIndex!].name;
-      description ??= taskData.tasks[widget.taskIndex!].description;
-      category ??= taskData.tasks[widget.taskIndex!].category;
-      dueDate ??= taskData.tasks[widget.taskIndex!].dueDate;
+    if (widget.taskId != null) {
+      task = taskData.getTaskById(widget.taskId!).task;
     } else {
       // Default values for new Task.
-      name ??= '';
-      category ??= Category.none;
-      dueDate ??= null;
+      task.name ??= '';
     }
 
     // Text controller for updating the date with the date picker.
     TextEditingController dateController = TextEditingController(
-      text: dueDate?.toString().substring(0, 16),
+      text: task.dueDate?.toString().substring(0, 16),
     );
 
     return Scaffold(
@@ -76,25 +63,10 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
             onPressed: () {
               // Validate the form when the user submits it.
               if (_formKey.currentState!.validate()) {
-                if (widget.taskIndex == null) {
-                  taskData.addTask(
-                    Task(
-                      name: name!,
-                      description: description,
-                      category: category ?? Category.none,
-                      dueDate: dueDate,
-                    ),
-                  );
+                if (widget.taskId == null) {
+                  taskData.addTask(BackendTask(task: task));
                 } else {
-                  taskData.modifyTask(
-                    widget.taskIndex!,
-                    Task(
-                      name: name!,
-                      description: description,
-                      category: category ?? Category.none,
-                      dueDate: dueDate,
-                    ),
-                  );
+                  taskData.modifyTask(BackendTask(task: task));
                 }
                 Navigator.pop(context);
               }
@@ -108,7 +80,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
           padding: const EdgeInsets.all(16.0),
           children: [
             TextFormField(
-              initialValue: name,
+              initialValue: task.name,
               decoration: const InputDecoration(
                 labelText: 'Name',
               ),
@@ -119,22 +91,22 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                 return null;
               },
               onChanged: (String? value) {
-                name = value;
+                task.name = value;
               },
             ),
             const SizedBox(height: 16.0),
             TextFormField(
-              initialValue: description,
+              initialValue: task.description,
               decoration: const InputDecoration(
                 labelText: 'Description',
               ),
               onChanged: (String? value) {
-                description = value;
+                task.description = value;
               },
             ),
             const SizedBox(height: 16.0),
             DropdownButtonFormField<Category>(
-              value: category,
+              value: task.category,
               decoration: const InputDecoration(
                 labelText: 'Category',
               ),
@@ -147,7 +119,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                   )
                   .toList(),
               onChanged: (Category? value) {
-                category = value;
+                task.category = value;
               },
             ),
             const SizedBox(height: 16.0),
@@ -160,7 +132,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                   // When the calendar button is pressed, open up a date picker.
                   onPressed: () => showDatePicker(
                     context: context,
-                    initialDate: dueDate ?? DateTime.now(),
+                    initialDate: task.dueDate ?? DateTime.now(),
                     // Allow the user to set any past date.
                     firstDate: DateTime.utc(-271821, 05, 20),
                     // Allow the user to set any future date.
@@ -172,33 +144,33 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                         value.year,
                         value.month,
                         value.day,
-                        dueDate?.hour ?? 0,
-                        dueDate?.minute ?? 0,
-                        dueDate?.second ?? 0,
-                        dueDate?.millisecond ?? 0,
-                        dueDate?.microsecond ?? 0,
+                        task.dueDate?.hour ?? 0,
+                        task.dueDate?.minute ?? 0,
+                        task.dueDate?.second ?? 0,
+                        task.dueDate?.millisecond ?? 0,
+                        task.dueDate?.microsecond ?? 0,
                       );
 
                       // Update the text field with the new date.
                       dateController.text =
                           combined.toString().substring(0, 16);
                       // Update the value of the due date.
-                      dueDate = combined;
+                      task.dueDate = combined;
 
                       // If a valid date was selected, open up a time picker.
                       showTimePicker(
                         context: context,
                         initialTime: TimeOfDay(
-                          hour: dueDate?.hour ?? 0,
-                          minute: dueDate?.minute ?? 0,
+                          hour: task.dueDate?.hour ?? 0,
+                          minute: task.dueDate?.minute ?? 0,
                         ),
                       ).then((TimeOfDay? value) {
                         if (value != null) {
                           // Ensure the new time does not overwrite the date.
                           DateTime combined = DateTime(
-                            dueDate?.year ?? DateTime.now().year,
-                            dueDate?.month ?? DateTime.now().month,
-                            dueDate?.day ?? DateTime.now().day,
+                            task.dueDate?.year ?? DateTime.now().year,
+                            task.dueDate?.month ?? DateTime.now().month,
+                            task.dueDate?.day ?? DateTime.now().day,
                             value.hour,
                             value.minute,
                           );
@@ -207,7 +179,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                           dateController.text =
                               combined.toString().substring(0, 16);
                           // Update the value of the due date.
-                          dueDate = combined;
+                          task.dueDate = combined;
                         }
                       });
                     }
@@ -217,7 +189,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
               validator: (String? value) {
                 if (value == null || value.isEmpty) return null;
                 try {
-                  dueDate = DateTime.parse(value);
+                  task.dueDate = DateTime.parse(value);
                 } catch (e) {
                   return 'Please enter a valid date.';
                 }
@@ -227,9 +199,9 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
               // will throw an error while the user is typing.
               onChanged: (value) {
                 try {
-                  dueDate = DateTime.parse(value);
+                  task.dueDate = DateTime.parse(value);
                 } catch (e) {
-                  dueDate = null;
+                  task.dueDate = null;
                 }
               },
             ),

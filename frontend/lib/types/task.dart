@@ -1,105 +1,44 @@
 import 'category.dart';
 
-/// This file contains the definition of the Task type.
-
-/// Public class [Task] represents a task created by the user. It exists to make
-/// it easier to add new features in the future.
+/// Public class [Task] represents a task created by the user. Different from
+/// BackendTask in that it can be modified, and generally should not be used to
+/// communicate with the backend.
 class Task {
-  /// The name of the task.
-  final String name;
-
-  /// Description of the task.
-  final String? description;
+  /// The id of the task.
+  int? id;
 
   /// The category of the task.
-  final Category category;
+  Category? category;
 
-  /// The due date of the task.
-  final DateTime? dueDate;
+  /// The name of the task.
+  String? name;
+
+  /// Description of the task.
+  String? description;
 
   /// When the task was created.
-  DateTime creationDate = DateTime.now();
+  DateTime? creationDate;
+
+  /// The due date of the task.
+  DateTime? dueDate;
 
   /// When the task was completed.
   DateTime? completionDate;
 
-  /// Completes the task if it isn't already.
-  void markComplete() {
-    if (!isCompleted) {
-      completionDate = DateTime.now();
-    }
-  }
-
-  /// Uncompletes the task if it is completed.
-  void markIncomplete() {
-    if (isCompleted) {
-      completionDate = null;
-    }
-  }
-
-  /// Toggles whether the task is completed.
-  void toggleCompleted() {
-    if (isCompleted) {
-      markIncomplete();
-    } else {
-      markComplete();
-    }
-  }
-
-  /// Whether the task is completed.
+  /// Whether the task is completed or not.
   bool get isCompleted => completionDate != null;
 
-  /// Whether the task has a due date.
-  bool get isDue => dueDate != null;
+  /// Whether the task has a due date or not.
+  bool get hasDueDate => dueDate != null;
 
-  /// Creates a new [Task] with the given [name], [category], and [dueDate].
+  /// Constructor for the [Task] class.
   Task({
-    required this.name,
+    this.id,
+    this.category,
+    this.name,
     this.description,
-    this.category = Category.none,
+    this.creationDate,
     this.dueDate,
+    this.completionDate,
   });
-
-  /// Creates a new [Task] from a map of values. The [category] parameter is
-  /// optional and defaults to [Category.none], but category can not be read
-  /// from the database as a [Category] object, so it must be passed in.
-  Task.fromMap(Map<String, dynamic> map, [this.category = Category.none])
-      : name = map['name'],
-        description = map['description'],
-        dueDate =
-            map['dueDate'] != 'NULL' ? DateTime.parse(map['dueDate']) : null,
-        creationDate = DateTime.parse(map['creationDate']),
-        completionDate = map['completionDate'] != 'NULL'
-            ? DateTime.parse(map['completionDate'])
-            : null;
-
-  /// Converts the [Task] to a map of values.
-  Map<String, dynamic> toMap() {
-    return {
-      'id': hashCode,
-      'name': name,
-      'description': description,
-      'category': category.name,
-      'dueDate': dueDate?.toString() ?? 'NULL',
-      'creationDate': creationDate.toString(),
-      'completionDate': completionDate?.toString() ?? 'NULL',
-    };
-  }
-
-  /// Overrides the equality operator so that two tasks are equal if they have
-  /// the same unique identifier. This way, even tasks with all the same details
-  /// are consedered to be different tasks.
-  @override
-  bool operator ==(Object other) {
-    if (other is Task) {
-      return hashCode == other.hashCode;
-    } else {
-      return false;
-    }
-  }
-
-  /// Overrides the hashcode getter so that no two tasks would reasonably have
-  /// the same hashcode.
-  @override
-  int get hashCode => creationDate.hashCode;
 }

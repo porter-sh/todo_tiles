@@ -1,40 +1,63 @@
-import 'dropdown_menu_item.dart';
-
 /// This file contains the definition of the [Category] type.
+
+import 'backend_translator.dart';
+import 'dropdown_menu_item.dart';
 
 /// Public class [Category] simply represents a category created by the user.
 /// It exists to make it easier to add new features in the future.
-class Category implements FilterMenuItem<Category> {
+class Category
+    implements FilterMenuItem<Category>, BackendTranslator<Category> {
+  /// The id of the category.
+  final int? id;
+
   /// The name of the category.
   final String name;
 
-  /// A description of the category.
+  /// The discription of the category.
   final String? description;
 
-  /// The category representing all tasks.
-  static const Category all = Category(name: 'All', description: 'All tasks.');
+  /// The color of the category.
+  final String? color;
 
-  /// The default category for tasks.
-  static const Category none =
-      Category(name: 'None', description: 'No category assigned.');
+  /// Constructor for the [Category] class.
+  Category({
+    this.id,
+    required this.name,
+    this.description,
+    this.color,
+  });
 
-  /// Creates a new [Category] with the given [name].
-  const Category({required this.name, this.description});
+  /// Category that represents all categories.
+  static final all = Category(name: 'All', description: 'All categories');
 
-  /// Creates a new [Category] from a map of values.
-  Category.fromMap(Map<String, dynamic> map)
-      : name = map['name'],
-        description = map['description'] == 'NULL' ? null : map['description'];
+  /// Category that represents no categories.
+  static final none = Category(name: 'None', description: 'No category');
 
-  /// Converts the [Category] to a map of values.
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'description': description ?? 'NULL',
-    };
+  /// Constructor for the [Category] class from a JSON object.
+  factory Category.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return none;
+    }
+    return Category(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      color: json['color'],
+    );
   }
 
-  /// Returns the name of the category.
+  /// Converts the [Category] object to a JSON object.
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'description': description,
+        'color': color,
+      };
+
+  /// Used for showing the category in a dropdown menu.
   @override
   String get value => name;
+
+  @override
+  String get backendRepresentation => name;
 }

@@ -6,7 +6,8 @@ import 'package:provider/provider.dart';
 
 import '../../components/icon_text.dart';
 import '../../task_data.dart';
-import '../../types/task.dart';
+import '../../types/backend_task.dart';
+import '../../types/category.dart';
 import 'task_tile_edit_dialog.dart';
 
 /// Public class [TaskTileInfoDialog] is a [StatelessWidget] that displays a
@@ -15,18 +16,18 @@ class TaskTileInfoDialog extends StatelessWidget {
   /// Creates a [TaskTileInfoDialog] widget.
   const TaskTileInfoDialog({
     super.key,
-    required this.taskIndex,
+    required this.taskId,
   });
 
   /// The task to display.
-  final int taskIndex;
+  final int taskId;
 
   /// Returns the widget that displays the [Dialog] with more information about
   /// the task.
   @override
   Widget build(BuildContext context) {
     TaskData taskData = context.watch<TaskData>();
-    Task task = taskData.tasks[taskIndex];
+    BackendTask task = taskData.getTaskById(taskId);
     IconText countdownWidget = getCountdownWidget(context, task);
 
     return Dialog(
@@ -36,7 +37,7 @@ class TaskTileInfoDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              task.name,
+              task.name ?? 'Unnamed task',
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             if (task.description != null) Text(task.description!),
@@ -49,7 +50,7 @@ class TaskTileInfoDialog extends StatelessWidget {
                     children: [
                       IconText(
                         icon: const Icon(Icons.category),
-                        text: Text(task.category.name),
+                        text: Text(task.category?.name ?? Category.none.name),
                       ),
                       IconText(
                         icon: const Icon(Icons.today),
@@ -89,7 +90,7 @@ class TaskTileInfoDialog extends StatelessWidget {
                       Navigator.pop(context);
                       // wait for the dialog to close before removing the task
                       Future.delayed(const Duration(milliseconds: 150), () {
-                        taskData.removeTask(taskIndex);
+                        taskData.removeTask(task);
                       });
                     }),
                 IconButton(
@@ -100,7 +101,7 @@ class TaskTileInfoDialog extends StatelessWidget {
                     showDialog<String>(
                       context: context,
                       builder: (BuildContext context) =>
-                          TaskTileEditDialog(taskIndex: taskIndex),
+                          TaskTileEditDialog(taskId: taskId),
                     ),
                   },
                 ),
@@ -108,13 +109,13 @@ class TaskTileInfoDialog extends StatelessWidget {
                   IconButton(
                     color: Colors.grey,
                     icon: const Icon(Icons.check),
-                    onPressed: () => taskData.markTaskIncomplete(taskIndex),
+                    onPressed: () => taskData.uncompleteTask(task),
                   )
                 else
                   IconButton(
                     color: Colors.green,
                     icon: const Icon(Icons.check),
-                    onPressed: () => taskData.markTaskComplete(taskIndex),
+                    onPressed: () => taskData.completeTask(task),
                   ),
               ],
             )
@@ -127,7 +128,7 @@ class TaskTileInfoDialog extends StatelessWidget {
   /// Returns a widget that displays a countdown if the task is due. Otherwise,
   /// returns a widget that displays that the task is either already completed,
   /// or has no due date.
-  IconText getCountdownWidget(BuildContext context, Task task) {
+  IconText getCountdownWidget(BuildContext context, BackendTask task) {
     if (task.isCompleted) {
       return IconText(
         icon: const Icon(Icons.task_alt),
@@ -136,7 +137,7 @@ class TaskTileInfoDialog extends StatelessWidget {
       );
     }
 
-    if (!task.isDue) {
+    if (!task.hasDueDate) {
       return const IconText(
         icon: Icon(Icons.timer_off),
         text: Text('Not due.'),

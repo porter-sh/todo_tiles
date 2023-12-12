@@ -111,7 +111,8 @@ class _HomePageState extends State<HomePage> {
               ),
               itemCount: taskData.numTasks,
               itemBuilder: (context, index) {
-                return TaskTile(taskIndex: index);
+                int taskId = taskData.getTaskIdByIndex(index);
+                return TaskTile(taskId: taskId);
               },
             ),
           ),
