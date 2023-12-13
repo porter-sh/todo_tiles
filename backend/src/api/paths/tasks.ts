@@ -84,3 +84,27 @@ tasksRouter.put('/', async (req: Request, res: Response) => {
 
     res.send(newTask.toJSON());
 });
+
+/**
+ * Mark a task as completed or not completed for the current user.
+ */
+tasksRouter.put('/:id/completed/', async (req: Request, res: Response) => {
+    const userId = req.decodedFirebaseToken.uid;
+    const taskId = req.params.id;
+    const completed = req.body.completed;
+
+    logger.http(`PUT /tasks/${taskId}/completed, body: ${JSON.stringify(req.body)}`);
+
+    let taskIdNum: number;
+    try {
+        taskIdNum = parseInt(taskId);
+    } catch {
+        res.sendStatus(400);
+        return;
+    }
+
+    let updatedTask = await Database.setTaskCompleted(userId, taskIdNum, completed);
+
+    res.send(updatedTask.toJSON());
+}
+);

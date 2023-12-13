@@ -145,24 +145,12 @@ class TaskData with ChangeNotifier {
   }
 
   /// Set a task to completed on the backend, then update the list of tasks.
-  void completeTask(BackendTask task) {
+  void completeTask(BackendTask task, {bool isCompleted = true}) {
     // Send the task to the database.
     API.put(
-      path: 'tasks/${task.id}/complete',
-      body: task.toJson(),
-    );
+        path: 'tasks/${task.id}/completed', body: {'completed': isCompleted});
 
-    syncTasksFromBackend();
-    notifyListeners();
-  }
-
-  /// Set a task to incomplete on the backend, then update the list of tasks.
-  void uncompleteTask(BackendTask task) {
-    // Send the task to the database.
-    API.put(
-      path: 'tasks/${task.id}/uncomplete',
-      body: task.toJson(),
-    );
+    task.completionDate = isCompleted ? DateTime.now() : null;
 
     syncTasksFromBackend();
     notifyListeners();
@@ -171,10 +159,6 @@ class TaskData with ChangeNotifier {
   /// Toggle whether a task is completed.
   void toggleTaskCompleted(int taskId) {
     BackendTask task = getTaskById(taskId);
-    if (task.isCompleted) {
-      uncompleteTask(task);
-    } else {
-      completeTask(task);
-    }
+    completeTask(task, isCompleted: !task.isCompleted);
   }
 }

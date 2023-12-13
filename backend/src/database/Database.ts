@@ -111,7 +111,7 @@ export default class Database {
      * Initialize the database.
      */
     constructor() {
-        logger.info('Initializing the database.');
+        logger.info('[DATABASE] Initializing the database.');
 
         Database.db = new sqlite3.Database('db.sqlite');
 
@@ -148,7 +148,7 @@ export default class Database {
     public static getTasks(userId: string, categoryId?: number,
         filter?: TaskFilter,
         timeHorizon?: TimeHorizon): Promise<Task[]> {
-        logger.debug(`Getting tasks for user [${userId}], with category [${categoryId}], filter [${filter?.displayString}], and time horizon [${timeHorizon?.displayString}].`);
+        logger.debug(`[DATABASE] Getting tasks for user [${userId}], with category [${categoryId}], filter [${filter?.displayString}], and time horizon [${timeHorizon?.displayString}].`);
 
         return new Promise((resolve, reject) => {
             let sql = `SELECT * FROM tasks WHERE user_id = ?`;
@@ -169,15 +169,15 @@ export default class Database {
 
             sql += ` ORDER BY due_date ASC`;
 
-            logger.debug(`SQL: ${sql}, params: [${params}]`);
+            logger.debug(`[DATABASE] SQL: ${sql}, params: [${params}]`);
 
             Database.db.all(sql, params, (err, rows) => {
                 if (err) {
-                    logger.error(`Error getting tasks: ${err}`);
+                    logger.error(`[DATABASE] Error getting tasks: ${err}`);
                     reject(err);
                 } else {
                     let res = rows.map((row) => Task.fromRow(row));
-                    logger.debug(`Found ${res.length} tasks.`);
+                    logger.debug(`[DATABASE] Found ${res.length} tasks.`);
                     resolve(res);
                 }
             });
@@ -190,20 +190,20 @@ export default class Database {
      * @returns A promise that resolves to the task.
     */
     public static getTask(id: number): Promise<Task> {
-        logger.debug(`Getting task with id [${id}].`);
+        logger.debug(`[DATABASE] Getting task with id [${id}].`);
 
         return new Promise((resolve, reject) => {
             let sql = `SELECT * FROM tasks WHERE id = ?`;
 
-            logger.debug(`SQL: ${sql}, params: [${id}]`);
+            logger.debug(`[DATABASE] SQL: ${sql}, params: [${id}]`);
 
             Database.db.get(sql, [id], (err, row) => {
                 if (err) {
-                    logger.error(`Error getting task: ${err}`);
+                    logger.error(`[DATABASE] Error getting task: ${err}`);
                     reject(err);
                 } else {
                     let res = Task.fromRow(row);
-                    logger.debug(`Found task: ${res.toString()}`);
+                    logger.debug(`[DATABASE] Found task: ${res.toString()}`);
                     resolve(res);
                 }
             });
@@ -222,20 +222,20 @@ export default class Database {
     public static createTask(userId: string, name: string, categoryId?: number,
         description?: string, dueDate?: Date, completionDate?: Date):
         Promise<Task> {
-        logger.debug(`Creating task for user [${userId}], with category [${categoryId}], name [${name}], description [${description}], due date [${dueDate}], and completion date [${completionDate}].`);
+        logger.debug(`[DATABASE] Creating task for user [${userId}], with category [${categoryId}], name [${name}], description [${description}], due date [${dueDate}], and completion date [${completionDate}].`);
 
         return new Promise((resolve, reject) => {
             let sql = `INSERT INTO tasks (user_id, category_id, name, description, creation_date, due_date) VALUES (?, ?, ?, ?, datetime('now'), ?)`;
             let params = [userId, categoryId, name, description, dueDate];
 
-            logger.debug(`SQL: ${sql}, params: [${params}]`);
+            logger.debug(`[DATABASE] SQL: ${sql}, params: [${params}]`);
 
             Database.db.run(sql, params, function (err) {
                 if (err) {
-                    logger.error(`Error creating task: ${err}`);
+                    logger.error(`[DATABASE] Error creating task: ${err}`);
                     reject(err);
                 } else {
-                    logger.debug(`Created task with id [${this.lastID}].`);
+                    logger.debug(`[DATABASE] Created task with id [${this.lastID}].`);
                     resolve(this.lastID);
                 }
             });
@@ -250,21 +250,21 @@ export default class Database {
      * @returns A promise that resolves when the task is updated.
      */
     public static updateTask(task: Task): Promise<Task> {
-        logger.debug(`Updating task [${task.toString()}].`);
+        logger.debug(`[DATABASE] Updating task [${task.toString()}].`);
 
         return new Promise<void>((resolve, reject) => {
             let sql = `UPDATE tasks SET category_id = ?, name = ?, description = ?, due_date = ?, completion_date = ? WHERE id = ?`;
             let params = [task.categoryId, task.name, task.description,
             task.dueDate, task.completionDate, task.id];
 
-            logger.debug(`SQL: ${sql}, params: [${params}]`);
+            logger.debug(`[DATABASE] SQL: ${sql}, params: [${params}]`);
 
             Database.db.run(sql, params, (err) => {
                 if (err) {
-                    logger.error(`Error updating task: ${err}`);
+                    logger.error(`[DATABASE] Error updating task: ${err}`);
                     reject(err);
                 } else {
-                    logger.debug(`Updated task.`);
+                    logger.debug(`[DATABASE] Updated task.`);
                     resolve();
                 }
             });
@@ -272,5 +272,40 @@ export default class Database {
             return Database.getTask(task.id);
         });
     }
-}
 
+    /**
+     * Mark a task as completed or not completed.
+     * @param userId The user id.
+     * @param id The task id.
+     * @param completed Whether the task is completed.
+     * @returns A promise that resolves when the task is updated.
+     */
+    public static setTaskCompleted(userId: number, id: number, completed: boolean):
+        Promise<Task> {
+        logger.debug(`[DATABASE] Setting task [${id}] to completion [${completed}].`);
+
+        return new Promise<void>((resolve, reject) => {
+            let sql = ``;
+            if (completed) {
+                sql = `UPDATE tasks SET completion_date = datetime('now') WHERE id = ? AND user_id = ?`;
+            } else {
+                sql = `UPDATE tasks SET completion_date = NULL WHERE id = ? AND user_id = ?`;
+            }
+            let params = [id, userId];
+
+            logger.debug(`SQL: ${sql}, params: [${params}]`);
+
+            Database.db.run(sql, params, (err) => {
+                if (err) {
+                    logger.error(`[DATABASE] Error setting task completion: ${err}.`);
+                    reject(err);
+                } else {
+                    logger.debug(`[DATABASE] Set task completion: ${err}.`);
+                    resolve();
+                }
+            });
+        }).then(() => {
+            return Database.getTask(id);
+        });
+    }
+}

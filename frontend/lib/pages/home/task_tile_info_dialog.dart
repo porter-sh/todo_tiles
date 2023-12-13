@@ -109,7 +109,8 @@ class TaskTileInfoDialog extends StatelessWidget {
                   IconButton(
                     color: Colors.grey,
                     icon: const Icon(Icons.check),
-                    onPressed: () => taskData.uncompleteTask(task),
+                    onPressed: () =>
+                        taskData.completeTask(task, isCompleted: false),
                   )
                 else
                   IconButton(
