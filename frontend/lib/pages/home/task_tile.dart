@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../task_data.dart';
-import '../../types/backend_task.dart';
+import '../../types/task.dart';
 import './task_tile_info_dialog.dart';
 
 /// Public class [TaskTile] is a [StatelessWidget] that displays a task as a
@@ -26,7 +26,7 @@ class TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TaskData taskData = context.watch<TaskData>();
-    final BackendTask task = taskData.getTaskById(taskId);
+    final Task task = taskData.getTaskById(taskId);
 
     ButtonStyle notCompletedStyle = ElevatedButton.styleFrom(
       foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,

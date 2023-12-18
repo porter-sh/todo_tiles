@@ -1,8 +1,6 @@
 import 'category.dart';
 
-/// Public class [Task] represents a task created by the user. Different from
-/// BackendTask in that it can be modified, and generally should not be used to
-/// communicate with the backend.
+/// Public class [Task] represents a task created by the user.
 class Task {
   /// The id of the task.
   int? id;
@@ -41,4 +39,30 @@ class Task {
     this.dueDate,
     this.completionDate,
   });
+
+  /// Constructor for the [Task] class from a JSON object.
+  factory Task.fromJson(Map<String, dynamic> json) => Task(
+        id: json['id'],
+        category: Category.fromJson(json['category_id']),
+        name: json['name'],
+        description: json['description'],
+        creationDate: DateTime.tryParse(json['creation_date']),
+        dueDate: json['due_date'] == null
+            ? null
+            : DateTime.tryParse(json['due_date']),
+        completionDate: json['completion_date'] == null
+            ? null
+            : DateTime.tryParse(json['completion_date']),
+      );
+
+  /// Converts the [Task] object to a JSON object.
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'category': category?.toJson(),
+        'name': name,
+        'description': description,
+        'creation_date': creationDate?.toIso8601String(),
+        'due_date': dueDate?.toIso8601String(),
+        'completion_date': completionDate?.toIso8601String(),
+      };
 }

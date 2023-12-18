@@ -7,8 +7,8 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 
 import 'types/category.dart';
-import 'types/backend_task.dart';
 import 'types/completion_filter.dart';
+import 'types/task.dart';
 import 'types/time_horizon.dart';
 import 'util/api.dart';
 
@@ -72,7 +72,7 @@ class TaskData with ChangeNotifier {
   }
 
   /// The ids of the current tasks, mapped to their task.
-  Map<int, BackendTask> _tasks = {};
+  Map<int, Task> _tasks = {};
 
   /// Get the number of currently displayed tasks.
   int get numTasks => _tasks.length;
@@ -94,9 +94,9 @@ class TaskData with ChangeNotifier {
         response = [];
       }
       // Convert the response to a map of tasks.
-      Map<int, BackendTask> tasks = {};
+      Map<int, Task> tasks = {};
       for (var taskMap in response) {
-        BackendTask task = BackendTask.fromJson(taskMap);
+        Task task = Task.fromJson(taskMap);
         tasks[task.id!] = task;
       }
       return tasks;
@@ -105,13 +105,14 @@ class TaskData with ChangeNotifier {
     notifyListeners();
   }
 
-  BackendTask getTaskById(int id) => _tasks[id]!;
+  Task getTaskById(int id) => _tasks[id]!;
 
   /// Get the id of a task by its index in the list of tasks.
   int getTaskIdByIndex(int index) => _tasks.keys.elementAt(index);
 
-  /// Add a task to the list of tasks if it is not already in the list.
-  void addTask(BackendTask task) async {
+  /// Add a task to the list of tasks if it is not already in the list. This
+  /// needs to sync with the backend to ensure the task has a valid id.
+  void addTask(Task task) async {
     // Send the new task to the database.
     API.post(
       path: 'tasks',
@@ -122,43 +123,59 @@ class TaskData with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Remove a task from the database.
-  void removeTask(BackendTask task) {
-    // Send the task to the database.
-    API.delete(path: 'tasks/${task.id}');
+  /// Remove a task from the local list of tasks, and on the backend.
+  void removeTask(int? taskId) {
+    if (taskId == null || _tasks[taskId] == null) {
+      return;
+    }
 
-    syncTasksFromBackend();
+    _tasks.remove(taskId);
+
+    // Send the task to the database.
+    API.delete(path: 'tasks/$taskId');
+
     notifyListeners();
   }
 
-  /// Modify a task in the list of tasks on the backend, then update the list of
-  /// tasks to reflect the database.
-  void modifyTask(BackendTask newTask) {
-    // Send the new task to the database.
+  /// Update a task in the database. To be used when a task has already been
+  /// modified locally. Assumes a task with the same id is already in the list.
+  void updateTask(int taskId) {
+    if (_tasks[taskId] == null) {
+      return;
+    }
+
+    // Send the updated task to the database.
     API.put(
-      path: 'tasks/${newTask.id}',
-      body: newTask.toJson(),
+      path: 'tasks/$taskId',
+      body: _tasks[taskId]!.toJson(),
     );
 
-    syncTasksFromBackend();
     notifyListeners();
   }
 
-  /// Set a task to completed on the backend, then update the list of tasks.
-  void completeTask(BackendTask task, {bool isCompleted = true}) {
-    // Send the task to the database.
-    API.put(
-        path: 'tasks/${task.id}/completed', body: {'completed': isCompleted});
+  /// Update a task in the database given a Task. Assumes a task with the same
+  /// id is already in the list.
+  void commitTask(Task task) {
+    _tasks[task.id!] = task;
+    updateTask(task.id!);
+  }
 
-    task.completionDate = isCompleted ? DateTime.now() : null;
+  /// Set task completion locally and on the backend.
+  void completeTask(int? taskId, {bool isCompleted = true}) {
+    if (taskId == null || _tasks[taskId] == null) {
+      return;
+    }
 
-    syncTasksFromBackend();
+    _tasks[taskId]!.completionDate = isCompleted ? DateTime.now() : null;
+
+    // Send the update to the database.
+    API.put(path: 'tasks/$taskId/completed', body: {'completed': isCompleted});
+
     notifyListeners();
   }
 
   /// Toggle whether a task is completed.
   void toggleTaskCompleted(int taskId) {
-    BackendTask task = getTaskById(taskId);
-    completeTask(task, isCompleted: !task.isCompleted);
+    completeTask(taskId, isCompleted: !_tasks[taskId]!.isCompleted);
   }
 }

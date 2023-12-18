@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../task_data.dart';
-import '../../types/backend_task.dart';
 import '../../types/category.dart';
 import '../../types/task.dart';
 
@@ -42,7 +41,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
 
     // Update the text fields with the current values of the task.
     if (widget.taskId != null) {
-      task = taskData.getTaskById(widget.taskId!).task;
+      task = taskData.getTaskById(widget.taskId!);
     } else {
       // Default values for new Task.
       task.name ??= '';
@@ -64,9 +63,9 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
               // Validate the form when the user submits it.
               if (_formKey.currentState!.validate()) {
                 if (widget.taskId == null) {
-                  taskData.addTask(BackendTask(task: task));
+                  taskData.addTask(task);
                 } else {
-                  taskData.modifyTask(BackendTask(task: task));
+                  taskData.commitTask(task);
                 }
                 Navigator.pop(context);
               }
