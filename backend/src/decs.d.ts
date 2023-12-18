@@ -1,5 +1,5 @@
 declare namespace Express {
-    interface Request {
-        decodedFirebaseToken?: DecodedIdToken;
-    }
+  interface Request {
+    decodedFirebaseToken?: DecodedIdToken;
+  }
 }

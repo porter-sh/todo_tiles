@@ -1,15 +1,15 @@
-import verifyUser from './api/util/auth';
-import logger from './logger';
-import Database from './database/Database';
+import verifyUser from "./api/util/auth";
+import logger from "./logger";
+import Database from "./database/Database";
 
-const https = require('https');
-const fs = require('fs');
-const express = require('express');
+const https = require("https");
+const fs = require("fs");
+const express = require("express");
 const app = express();
 const PORT = 8080;
 
-const { usersRouter } = require('./api/paths/users');
-const { tasksRouter } = require('./api/paths/tasks');
+const { usersRouter } = require("./api/paths/users");
+const { tasksRouter } = require("./api/paths/tasks");
 
 // Initialize the database
 const db = new Database();
@@ -18,12 +18,12 @@ const db = new Database();
 app.use(express.json());
 
 app.use(verifyUser);
-app.use('/users', usersRouter);
-app.use('/tasks', tasksRouter);
+app.use("/users", usersRouter);
+app.use("/tasks", tasksRouter);
 
 // Read the certificate and key files
-const privateKey = fs.readFileSync('server.key', 'utf8');
-const certificate = fs.readFileSync('server.cert', 'utf8');
+const privateKey = fs.readFileSync("server.key", "utf8");
+const certificate = fs.readFileSync("server.cert", "utf8");
 
 // Create an HTTPS server
 const server = https.createServer({ key: privateKey, cert: certificate }, app);

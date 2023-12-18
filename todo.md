@@ -1,0 +1,1 @@
+- When a user marks a task completed on the frontend, send the completion time to the backend, instead of just using datetime(now) in the database.
