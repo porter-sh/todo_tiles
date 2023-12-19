@@ -48,6 +48,30 @@ class TaskData with ChangeNotifier {
   /// Returns the number of categories stored.
   int get numCategories => _categories.length;
 
+  /// Update the list of categories to reflect the database.
+  void syncCategoriesFromBackend() async {
+    // Clear the list of categories.
+    _categories.clear();
+
+    _categories.addAll(await API.get(path: 'categories').then((response) {
+      try {
+        response = response as List<dynamic>;
+      } catch (e) {
+        // Malformed response.
+        response = [];
+      }
+      // Convert the response to a list of categories.
+      List<Category> categories = [];
+      for (var categoryMap in response) {
+        Category category = Category.fromJson(categoryMap);
+        categories.add(category);
+      }
+      return categories;
+    }));
+
+    notifyListeners();
+  }
+
   /// Add a category to the list of categories if it is not already in the list.
   void addCategory(Category category) {
     if (!_categories.contains(category)) {

@@ -10,6 +10,7 @@ const PORT = 8080;
 
 const { usersRouter } = require("./api/paths/users");
 const { tasksRouter } = require("./api/paths/tasks");
+const { categoriesRouter } = require("./api/paths/categories");
 const { testRouter } = require("./api/paths/test");
 
 // Initialize the database

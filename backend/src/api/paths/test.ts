@@ -12,7 +12,10 @@ export const testRouter = express.Router();
  */
 testRouter.get("/", async (req: Request, res: Response) => {
   logger.http(`GET /tasks`);
+
+  // Database.deleteDatabase();
   Database.test();
+
   logger.info("");
   res.send("Done.");
 });

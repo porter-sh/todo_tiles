@@ -1,5 +1,6 @@
 import sqlite3 from "sqlite3";
 import Task from "./Task";
+import Category from "./Category";
 import logger from "../logger";
 
 enum Tables {
@@ -122,7 +123,8 @@ export default class Database {
           id INTEGER PRIMARY KEY,
           user_id INTEGER NOT NULL,
           name TEXT NOT NULL,
-          description TEXT
+          description TEXT,
+          display_color TEXT
         )`);
 
     // Create the tasks table
@@ -137,6 +139,44 @@ export default class Database {
           completion_date TEXT,
           FOREIGN KEY (category_id) REFERENCES categories (id)
         )`);
+  }
+
+  /**
+   * Delete the database.
+   */
+  public static deleteDatabase(): void {
+    logger.info("[DATABASE] Deleting the database.");
+
+    Database.db.run(
+      `DROP TABLE IF EXISTS categories; DROP TABLE IF EXISTS tasks;`,
+    );
+  }
+
+  /**
+   * Dummy function for testing.
+   */
+  public static async test(): Promise<void> {
+    logger.debug(`[DATABASE] Running test.`);
+
+    return new Promise<void>((resolve, reject) => {
+      let sql = `SELECT * FROM categories`;
+
+      logger.debug(`[DATABASE] SQL: ${sql}`);
+
+      Database.db.all(sql, (err, rows) => {
+        if (err) {
+          logger.error(`[DATABASE] Error running test: ${err}`);
+          reject(err);
+        } else {
+          logger.debug(
+            `[DATABASE] Found ${rows.length} rows: ${rows.map((row) => {
+              return "\n" + Task.fromRow(row).toString();
+            })}`,
+          );
+          resolve();
+        }
+      });
+    });
   }
 
   /**
@@ -353,7 +393,7 @@ export default class Database {
           logger.error(`[DATABASE] Error setting task completion: ${err}.`);
           reject(err);
         } else {
-          logger.debug(`[DATABASE] Set task completion: ${err}.`);
+          logger.debug(`[DATABASE] Set task completion: ${completed}.`);
           resolve();
         }
       });
@@ -363,29 +403,92 @@ export default class Database {
   }
 
   /**
-   * Dummy function for testing.
+   * Get the categories for a user.
+   * @param userId The user id.
+   * @returns A promise that resolves to an array of categories.
    */
-  public static async test(): Promise<void> {
-    logger.debug(`[DATABASE] Running test.`);
+  public static async getCategories(userId: string): Promise<Category[]> {
+    logger.debug(`[DATABASE] Getting categories for user [${userId}].`);
 
-    return new Promise<void>((resolve, reject) => {
-      let sql = `SELECT * FROM tasks`;
+    return new Promise((resolve, reject) => {
+      let sql = `SELECT * FROM categories WHERE user_id = ?`;
 
-      logger.debug(`[DATABASE] SQL: ${sql}`);
+      logger.debug(`[DATABASE] SQL: ${sql}, params: [${userId}]`);
 
-      Database.db.all(sql, (err, rows) => {
+      Database.db.all(sql, [userId], (err, rows) => {
         if (err) {
-          logger.error(`[DATABASE] Error running test: ${err}`);
+          logger.error(`[DATABASE] Error getting categories: ${err}`);
           reject(err);
         } else {
-          logger.debug(
-            `[DATABASE] Found ${rows.length} tasks: ${rows.map((row) => {
-              return "\n" + Task.fromRow(row).toString();
-            })}`,
-          );
-          resolve();
+          let res = rows.map((row) => Category.fromRow(row));
+          logger.debug(`[DATABASE] Found ${res.length} categories.`);
+          resolve(res);
         }
       });
+    });
+  }
+
+  /**
+   * Get a category by id.
+   * @param id The category id.
+   * @returns A promise that resolves to the category.
+   */
+  public static getCategory(id: number): Promise<Category> {
+    logger.debug(`[DATABASE] Getting category with id [${id}].`);
+
+    return new Promise((resolve, reject) => {
+      let sql = `SELECT * FROM categories WHERE id = ?`;
+
+      logger.debug(`[DATABASE] SQL: ${sql}, params: [${id}]`);
+
+      Database.db.get(sql, [id], (err, row) => {
+        if (err) {
+          logger.error(`[DATABASE] Error getting category: ${err}`);
+          reject(err);
+        } else {
+          let res = Category.fromRow(row);
+          logger.debug(`[DATABASE] Found category: ${res.toString()}`);
+          resolve(res);
+        }
+      });
+    });
+  }
+
+  /**
+   * Create a new category.
+   * @param userId The user id.
+   * @param name The category name.
+   * @param description The category description.
+   * @param displayColor The category display color.
+   * @returns A promise that resolves to the new category.
+   */
+  public static createCategory(
+    userId: string,
+    name: string,
+    description?: string,
+    displayColor?: string,
+  ): Promise<Category> {
+    logger.debug(
+      `[DATABASE] Creating category for user [${userId}], name [${name}], description [${description}], and display color [${displayColor}].`,
+    );
+
+    return new Promise((resolve, reject) => {
+      let sql = `INSERT INTO categories (user_id, name, description, display_color) VALUES (?, ?, ?, ?)`;
+      let params = [userId, name, description, displayColor];
+
+      logger.debug(`[DATABASE] SQL: ${sql}, params: [${params}]`);
+
+      Database.db.run(sql, params, function (err) {
+        if (err) {
+          logger.error(`[DATABASE] Error creating category: ${err}`);
+          reject(err);
+        } else {
+          logger.debug(`[DATABASE] Created category with id [${this.lastID}].`);
+          resolve(this.lastID);
+        }
+      });
+    }).then((id) => {
+      return Database.getCategory(id as number);
     });
   }
 }
