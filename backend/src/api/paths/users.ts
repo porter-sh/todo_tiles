@@ -21,5 +21,8 @@ usersRouter.get("/:id", (req: Request, res: Response) => {
     throw new Error("Authentication token does not match user id.");
   }
 
-  res.send(`Hello ${id}!`);
+  res.send({
+    id: id,
+    authToken: req.get("Authorization"),
+  });
 });

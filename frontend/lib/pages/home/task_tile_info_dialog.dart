@@ -130,7 +130,6 @@ class TaskTileInfoDialog extends StatelessWidget {
             'Completed: ${task.completionDate.toString().substring(5, 16)}'),
       );
     }
-    task.name = 'test';
 
     if (!task.hasDueDate) {
       return const IconText(
