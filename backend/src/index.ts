@@ -10,6 +10,7 @@ const PORT = 8080;
 
 const { usersRouter } = require("./api/paths/users");
 const { tasksRouter } = require("./api/paths/tasks");
+const { testRouter } = require("./api/paths/test");
 
 // Initialize the database
 const db = new Database();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(verifyUser);
 app.use("/users", usersRouter);
 app.use("/tasks", tasksRouter);
+app.use("/test", testRouter);
 
 // Read the certificate and key files
 const privateKey = fs.readFileSync("server.key", "utf8");

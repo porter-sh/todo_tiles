@@ -361,4 +361,31 @@ export default class Database {
       return Database.getTask(id);
     });
   }
+
+  /**
+   * Dummy function for testing.
+   */
+  public static async test(): Promise<void> {
+    logger.debug(`[DATABASE] Running test.`);
+
+    return new Promise<void>((resolve, reject) => {
+      let sql = `SELECT * FROM tasks`;
+
+      logger.debug(`[DATABASE] SQL: ${sql}`);
+
+      Database.db.all(sql, (err, rows) => {
+        if (err) {
+          logger.error(`[DATABASE] Error running test: ${err}`);
+          reject(err);
+        } else {
+          logger.debug(
+            `[DATABASE] Found ${rows.length} tasks: ${rows.map((row) => {
+              return "\n" + Task.fromRow(row).toString();
+            })}`,
+          );
+          resolve();
+        }
+      });
+    });
+  }
 }
