@@ -33,14 +33,14 @@ export default class Task {
    */
   public static fromRow(row: any): Task {
     return new Task(
-      row.id,
-      row.user_id,
-      row.category_id,
-      row.name,
-      row.description,
-      row.creation_date,
-      row.due_date,
-      row.completion_date,
+      row.id as number,
+      row.user_id as string,
+      row.category_id as number | null,
+      row.name as string,
+      row.description as string | null,
+      row.creation_date as string,
+      row.due_date as string | null,
+      row.completion_date as string | null,
     );
   }
 

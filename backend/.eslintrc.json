@@ -12,5 +12,9 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "rules": {}
+  "rules": {
+    "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/restrict-template-expressions": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off"
+  }
 }

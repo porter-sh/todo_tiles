@@ -1,9 +1,6 @@
-import { Request, Response } from "express";
+import express, { type Request, type Response } from "express";
 import logger from "../../logger";
-import Database from "../../database/Database";
-import Task from "../../database/Task";
-
-const express = require("express");
+import * as Database from "../../database/Database";
 
 export const testRouter = express.Router();
 
@@ -14,7 +11,7 @@ testRouter.get("/", async (req: Request, res: Response) => {
   logger.http(`GET /tasks`);
 
   // Database.deleteDatabase();
-  Database.test();
+  void Database.test();
 
   logger.info("");
   res.send("Done.");

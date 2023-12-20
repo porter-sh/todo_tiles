@@ -24,11 +24,11 @@ export default class Category {
    */
   public static fromRow(row: any): Category {
     return new Category(
-      row.id,
-      row.user_id,
-      row.name,
-      row.description,
-      row.display_color,
+      row.id as number,
+      row.user_id as string,
+      row.name as string,
+      row.description as string | null,
+      row.display_color as string | null,
     );
   }
 

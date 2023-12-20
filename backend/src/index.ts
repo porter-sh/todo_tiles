@@ -1,20 +1,15 @@
-import verifyUser from "./api/util/auth";
-import logger from "./logger";
-import Database from "./database/Database";
+import https from "https";
+import fs from "fs";
+import express from "express";
 
-const https = require("https");
-const fs = require("fs");
-const express = require("express");
+import verifyUser from "./api/util/auth";
+import { usersRouter } from "./api/paths/users";
+import { tasksRouter } from "./api/paths/tasks";
+import { testRouter } from "./api/paths/test";
+import logger from "./logger";
+
 const app = express();
 const PORT = 8080;
-
-const { usersRouter } = require("./api/paths/users");
-const { tasksRouter } = require("./api/paths/tasks");
-const { categoriesRouter } = require("./api/paths/categories");
-const { testRouter } = require("./api/paths/test");
-
-// Initialize the database
-const db = new Database();
 
 // Enable JSON parsing
 app.use(express.json());

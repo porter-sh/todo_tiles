@@ -1,7 +1,5 @@
-import { Request, Response } from "express";
+import express, { type Request, type Response } from "express";
 import logger from "../../logger";
-
-const express = require("express");
 
 export const usersRouter = express.Router();
 
@@ -13,7 +11,7 @@ usersRouter.get("/:id", (req: Request, res: Response) => {
 
   logger.http(`GET /users/${id}`);
 
-  if (id != req.decodedFirebaseToken.uid) {
+  if (id !== req.decodedFirebaseToken.uid) {
     logger.warn(
       `Client requested user [${id}] but is authenticated with [${req.decodedFirebaseToken.uid}].`,
     );
@@ -22,7 +20,7 @@ usersRouter.get("/:id", (req: Request, res: Response) => {
   }
 
   res.send({
-    id: id,
+    id,
     authToken: req.get("Authorization"),
   });
 });

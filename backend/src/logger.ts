@@ -11,7 +11,7 @@ enum Colors {
 }
 
 class ColorConsoleTrasport extends Transport {
-  log(info: winston.Logform.TransformableInfo, callback: () => void) {
+  log(info: winston.Logform.TransformableInfo, callback: () => void): void {
     setImmediate(() => {
       this.emit("logged", info);
     });
