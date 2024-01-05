@@ -1,11 +1,9 @@
 /// This file contains the simple [CompletionFilter] enum for representing
 /// different levels of completion of tasks for filtering.
 
-import 'package:todo_tiles/types/backend_translator.dart';
-
 /// Enum representing different levels of completion of tasks. To be used for
 /// filtering tasks based on their completion status.
-enum CompletionFilter implements BackendTranslator<CompletionFilter> {
+enum CompletionFilter {
   // Do not filter tasks.
   all(string: 'all'),
   // Only show completed tasks.
@@ -23,7 +21,4 @@ enum CompletionFilter implements BackendTranslator<CompletionFilter> {
   });
 
   final String string;
-
-  @override
-  String get backendRepresentation => string;
 }

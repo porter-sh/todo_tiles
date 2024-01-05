@@ -5,6 +5,7 @@ import express from "express";
 import verifyUser from "./api/util/auth";
 import { usersRouter } from "./api/paths/users";
 import { tasksRouter } from "./api/paths/tasks";
+import { categoriesRouter } from "./api/paths/categories";
 import { testRouter } from "./api/paths/test";
 import logger from "./logger";
 
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use(verifyUser);
 app.use("/users", usersRouter);
+app.use("/categories", categoriesRouter);
 app.use("/tasks", tasksRouter);
 app.use("/test", testRouter);
 

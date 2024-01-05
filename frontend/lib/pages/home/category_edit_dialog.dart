@@ -10,11 +10,11 @@ import '../../types/category.dart';
 /// Public class [CategoryEditDialog] is a fullscreen dialog used for creating
 /// and editing categories.
 class CategoryEditDialog extends StatefulWidget {
-  /// The index of the category being edited. A new category is created if null.
-  final int? categoryIndex;
+  /// The id of the category being edited. A new category is created if null.
+  final int? categoryId;
 
   /// Creates a new [CategoryEditDialog] with the given [categoryIndex].
-  const CategoryEditDialog({Key? key, this.categoryIndex}) : super(key: key);
+  const CategoryEditDialog({Key? key, this.categoryId}) : super(key: key);
 
   /// Returns the state of the [CategoryEditDialog].
   @override
@@ -24,11 +24,8 @@ class CategoryEditDialog extends StatefulWidget {
 /// Private class [_CategoryEditDialogState] contains the state for the
 /// [CategoryEditDialog].
 class _CategoryEditDialogState extends State<CategoryEditDialog> {
-  /// The name of the category.
-  String? name;
-
-  /// The description of the category.
-  String? description;
+  /// The new category.
+  Category category = Category();
 
   /// The form key for the form.
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -39,13 +36,12 @@ class _CategoryEditDialogState extends State<CategoryEditDialog> {
     TaskData taskData = context.watch<TaskData>();
 
     // Update the text fields with the current values of the category.
-    if (widget.categoryIndex != null) {
-      name ??= taskData.userCategories[widget.categoryIndex!].name;
-      description ??=
-          taskData.userCategories[widget.categoryIndex!].description;
+    if (widget.categoryId != null &&
+        taskData.getCategoryById(widget.categoryId!) != null) {
+      category = Category.from(taskData.getCategoryById(widget.categoryId!));
     } else {
       // Default values for new Category.
-      name ??= '';
+      category.name ??= '';
     }
 
     return Scaffold(
@@ -54,44 +50,33 @@ class _CategoryEditDialogState extends State<CategoryEditDialog> {
         title: const Text('Edit Category'),
         actions: [
           // Button to delete the category if it is not a new category.
-          if (widget.categoryIndex != null)
+          if (widget.categoryId != null && widget.categoryId! >= 0)
             IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
                 Navigator.pop(context);
                 // Wait for the dialog to close before deleting the category.
                 Future.delayed(const Duration(milliseconds: 150), () {
-                  taskData.removeCategory(
-                      taskData.userCategories[widget.categoryIndex!]);
+                  taskData.removeCategory(widget.categoryId!);
                 });
               },
             ),
           // Button to save changes.
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: () {
-              // Validate the form when the user submits it.
-              if (_formKey.currentState!.validate()) {
-                if (widget.categoryIndex == null) {
-                  taskData.addCategory(
-                    Category(
-                      name: name!,
-                      description: description,
-                    ),
-                  );
-                } else {
-                  taskData.modifyCategory(
-                    widget.categoryIndex!,
-                    Category(
-                      name: name!,
-                      description: description,
-                    ),
-                  );
+          if (widget.categoryId == null || widget.categoryId! >= 0)
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: () {
+                // Validate the form when the user submits it.
+                if (_formKey.currentState!.validate()) {
+                  if (widget.categoryId == null) {
+                    taskData.addCategory(category);
+                  } else {
+                    taskData.commitCategory(category);
+                  }
+                  Navigator.pop(context);
                 }
-                Navigator.pop(context);
-              }
-            },
-          ),
+              },
+            ),
         ],
       ),
       // The form for editing the category.
@@ -102,7 +87,7 @@ class _CategoryEditDialogState extends State<CategoryEditDialog> {
           children: [
             // Text field for the name of the category.
             TextFormField(
-              initialValue: name,
+              initialValue: category.name,
               decoration: const InputDecoration(
                 labelText: 'Name',
               ),
@@ -113,18 +98,47 @@ class _CategoryEditDialogState extends State<CategoryEditDialog> {
                 return null;
               },
               onChanged: (value) {
-                name = value;
+                category.name = value;
               },
             ),
             const SizedBox(height: 16.0),
             // Text field for the description of the category.
             TextFormField(
-              initialValue: description,
+              initialValue: category.description,
               decoration: const InputDecoration(
                 labelText: 'Description',
               ),
               onChanged: (value) {
-                description = value;
+                category.description = value;
+              },
+            ),
+            const SizedBox(height: 16.0),
+            // Dropdown menu for the color of the category.
+            DropdownButtonFormField<String>(
+              value: category.color,
+              decoration: const InputDecoration(
+                labelText: 'Color',
+              ),
+              items: [
+                'red',
+                'orange',
+                'yellow',
+                'green',
+                'blue',
+                'purple',
+                'pink',
+                'brown',
+                'grey',
+              ]
+                  .map(
+                    (String color) => DropdownMenuItem<String>(
+                      value: color,
+                      child: Text(color),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                category.color = value;
               },
             ),
           ],

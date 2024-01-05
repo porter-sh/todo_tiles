@@ -50,7 +50,7 @@ class TaskTileInfoDialog extends StatelessWidget {
                     children: [
                       IconText(
                         icon: const Icon(Icons.category),
-                        text: Text(task.category?.name ?? Category.none.name),
+                        text: Text(task.category?.name ?? Category.none.name!),
                       ),
                       IconText(
                         icon: const Icon(Icons.today),
@@ -90,7 +90,7 @@ class TaskTileInfoDialog extends StatelessWidget {
                       Navigator.pop(context);
                       // wait for the dialog to close before removing the task
                       Future.delayed(const Duration(milliseconds: 150), () {
-                        taskData.removeTask(task.id);
+                        taskData.removeTask(task.id!);
                       });
                     }),
                 IconButton(

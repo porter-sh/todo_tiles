@@ -18,6 +18,7 @@ class TaskData with ChangeNotifier {
   /// Update the data at the beginning to reflect the database.
   TaskData() {
     syncTasksFromBackend();
+    syncCategoriesFromBackend();
   }
 
   /// The category for the current view.
@@ -29,70 +30,101 @@ class TaskData with ChangeNotifier {
   /// The time horizon for the current view.
   TimeHorizon? _timeHorizonFilter;
 
-  /// The list of user-created task categories.
-  final List<Category> _categories = [];
+  /// Map of user-created task categories.
+  Map<int, Category> _categories = {
+    Category.all.id!: Category.all,
+    Category.none.id!: Category.none
+  };
 
-  /// Returns only the list of categories that have been created by the user.
-  UnmodifiableListView<Category> get userCategories =>
-      UnmodifiableListView(_categories);
+  /// List of the user-created categories.
+  List<Category> get categories => _categories.values.toList();
 
-  /// Returns the list of categories, with the default categories added. This is
-  /// used for sorting tasks by category.
-  UnmodifiableListView<Category> get sortCategories =>
-      UnmodifiableListView([Category.all, ..._categories]);
-
-  /// Returns the list of categories that the user can set for a task.
-  UnmodifiableListView<Category> get setCategories =>
-      UnmodifiableListView([Category.none, ..._categories]);
+  /// The list of categories that can be used to set tasks.
+  List<Category> get setCategories {
+    List<Category> setCategories = List.from(_categories.values);
+    setCategories.remove(Category.all);
+    return setCategories;
+  }
 
   /// Returns the number of categories stored.
   int get numCategories => _categories.length;
 
   /// Update the list of categories to reflect the database.
   void syncCategoriesFromBackend() async {
-    // Clear the list of categories.
-    _categories.clear();
-
-    _categories.addAll(await API.get(path: 'categories').then((response) {
+    _categories = await API.get(path: 'categories').then((response) {
       try {
         response = response as List<dynamic>;
       } catch (e) {
         // Malformed response.
         response = [];
       }
-      // Convert the response to a list of categories.
-      List<Category> categories = [];
+      // Convert the response to a map of categories.
+      Map<int, Category> categories = {};
       for (var categoryMap in response) {
         Category category = Category.fromJson(categoryMap);
-        categories.add(category);
+        categories[category.id!] = category;
       }
       return categories;
-    }));
+    });
+
+    _categories[Category.all.id!] = Category.all;
+    _categories[Category.none.id!] = Category.none;
 
     notifyListeners();
   }
 
+  /// Get the category by its id.
+  Category? getCategoryById(int id) => _categories[id];
+
   /// Add a category to the list of categories if it is not already in the list.
-  void addCategory(Category category) {
-    if (!_categories.contains(category)) {
-      _categories.add(category);
-      notifyListeners();
-    }
+  /// This needs to sync with the backend to ensure the category has a valid id.
+  void addCategory(Category category) async {
+    // Send the new category to the database.
+    await API.post(
+      path: 'categories',
+      body: category.toJson(),
+    );
+
+    syncCategoriesFromBackend();
+    notifyListeners();
   }
 
-  /// Remove a category from the list of categories if it is in the list.
-  void removeCategory(Category category) {
-    if (_categories.contains(category)) {
-      _categories.remove(category);
-      notifyListeners();
+  /// Remove a category from the local list of categories, and on the backend.
+  void removeCategory(int categoryId) {
+    if (_categories[categoryId] == null) {
+      return;
     }
+
+    _categories.remove(categoryId);
+
+    // Send the category to the database.
+    API.delete(path: 'categories/$categoryId');
+
+    notifyListeners();
   }
 
-  /// Modify a category in the list of categories by removing the old category
-  /// and adding the new category.
-  void modifyCategory(int categoryIndex, Category newCategory) {
-    removeCategory(_categories[categoryIndex]);
-    addCategory(newCategory);
+  /// Update a category in the database. To be used when a category has already
+  /// been modified locally. Assumes a category with the same id is already in
+  /// the list.
+  void updateCategory(int categoryId) {
+    if (_categories[categoryId] == null) {
+      return;
+    }
+
+    // Send the updated category to the database.
+    API.put(
+      path: 'categories/$categoryId',
+      body: _categories[categoryId]!.toJson(),
+    );
+
+    notifyListeners();
+  }
+
+  /// Update a category in the database given a Category. Assumes a category
+  /// with the same id is already in the list.
+  void commitCategory(Category category) {
+    _categories[category.id!] = category;
+    updateCategory(category.id!);
   }
 
   /// The ids of the current tasks, mapped to their task.
@@ -103,13 +135,10 @@ class TaskData with ChangeNotifier {
 
   /// Update the list of tasks to reflect the database.
   void syncTasksFromBackend() async {
-    // Clear the list of tasks.
-    _tasks = {};
-
     _tasks = await API.get(path: 'tasks', queryParameters: {
-      'categoryId': _categoryFilter?.backendRepresentation,
-      'filter': _completionFilter?.backendRepresentation,
-      'timeHorizon': _timeHorizonFilter?.backendRepresentation,
+      'categoryId': _categoryFilter?.name ?? '',
+      'filter': _completionFilter?.string ?? '',
+      'timeHorizon': _timeHorizonFilter?.string.toLowerCase() ?? '',
     }).then((response) {
       try {
         response = response as List<dynamic>;
@@ -138,7 +167,7 @@ class TaskData with ChangeNotifier {
   /// needs to sync with the backend to ensure the task has a valid id.
   void addTask(Task task) async {
     // Send the new task to the database.
-    API.post(
+    await API.post(
       path: 'tasks',
       body: task.toJson(),
     );
@@ -148,8 +177,8 @@ class TaskData with ChangeNotifier {
   }
 
   /// Remove a task from the local list of tasks, and on the backend.
-  void removeTask(int? taskId) {
-    if (taskId == null || _tasks[taskId] == null) {
+  void removeTask(int taskId) {
+    if (_tasks[taskId] == null) {
       return;
     }
 

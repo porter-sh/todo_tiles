@@ -113,7 +113,7 @@ class _TaskTileEditDialogState extends State<TaskTileEditDialog> {
                   .map(
                     (Category category) => DropdownMenuItem<Category>(
                       value: category,
-                      child: Text(category.name),
+                      child: Text(category.name ?? ''),
                     ),
                   )
                   .toList(),

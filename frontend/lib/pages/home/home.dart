@@ -25,7 +25,7 @@ class HomePage extends StatefulWidget {
 /// the public class [HomePage].
 class _HomePageState extends State<HomePage> {
   // Currently selected category filter.
-  int selectedCategoryIndex = 0;
+  int selectedCategoryId = Category.all.id!;
   // Currently selected due date filter.
   TimeHorizon timeHorizonView = TimeHorizon.all;
 
@@ -34,10 +34,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var taskData = context.watch<TaskData>();
 
-    // Safeguard against when the last category is deleted.
-    if (selectedCategoryIndex >= taskData.sortCategories.length) {
+    // Safeguard against the selected category being deleted.
+    if (taskData.getCategoryById(selectedCategoryId) == null) {
       setState(() {
-        selectedCategoryIndex = 0;
+        selectedCategoryId = Category.all.id!;
       });
     }
 
@@ -51,33 +51,25 @@ class _HomePageState extends State<HomePage> {
             children: [
               // Category filter.
               FilterDropdown<Category>(
-                value: taskData.sortCategories[selectedCategoryIndex],
-                items: taskData.sortCategories,
+                value: taskData.getCategoryById(selectedCategoryId)!,
+                items: taskData.categories,
                 onChanged: (Category? newValue) {
                   setState(() {
-                    int newIndex;
-                    try {
-                      newIndex = taskData.sortCategories.indexOf(newValue!);
-                    } catch (e) {
-                      newIndex = 0;
-                    }
-                    setState(() {
-                      selectedCategoryIndex = newIndex;
-                    });
+                    selectedCategoryId = newValue!.id!;
                   });
                 },
                 onLongPress: ({Category? object, int? index}) {
                   // Fullscreen popup for editing the category.
-                  if (index! > 0) {
+                  if (index! >= 0) {
                     // Close the dropdown.
                     Navigator.of(context).pop();
                     setState(() {
-                      selectedCategoryIndex = index;
+                      selectedCategoryId = object!.id!;
                     });
                     showDialog<String>(
                       context: context,
                       builder: (BuildContext context) =>
-                          CategoryEditDialog(categoryIndex: index - 1),
+                          CategoryEditDialog(categoryId: object!.id!),
                     );
                   }
                 },

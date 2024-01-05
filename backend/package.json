@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node ./build/index.js",
-    "dev": "tsc && node ./build/index.js",
+    "start": "node ./build/src/index.js",
+    "dev": "tsc && node ./build/src/index.js",
     "format": "npx prettier --write ."
   },
   "keywords": [],

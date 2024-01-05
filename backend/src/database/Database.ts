@@ -369,14 +369,14 @@ export async function setTaskCompleted(
 }
 
 /**
- * Get the categories for a user.
+ * Get the categories for a user sorted alphabetically.
  * @param userId The user id.
  * @returns A promise that resolves to an array of categories.
  */
 export async function getCategories(userId: string): Promise<Category[]> {
   logger.debug(`[DATABASE] Getting categories for user [${userId}].`);
 
-  const sql = `SELECT * FROM categories WHERE user_id = ?`;
+  const sql = `SELECT * FROM categories WHERE user_id = ? ORDER BY name ASC`;
 
   logger.debug(`[DATABASE] SQL: ${sql}, params: [${userId}]`);
 
@@ -450,6 +450,62 @@ export async function createCategory(
       }
       logger.debug(`[DATABASE] Created category with id [${this.lastID}].`);
       resolve(getCategory(this.lastID));
+    });
+  });
+}
+
+/**
+ * Update a category.
+ * @param category The updated version of the category. The id is invariant.
+ * @returns A promise that resolves when the category is updated.
+ */
+export async function updateCategory(category: Category): Promise<Category> {
+  logger.debug(`[DATABASE] Updating category [${category.toString()}].`);
+
+  const sql = `UPDATE categories SET name = ?, description = ?, display_color = ? WHERE id = ?`;
+  const params = [category.name, category.description, category.displayColor];
+
+  logger.debug(`[DATABASE] SQL: ${sql}, params: [${params}]`);
+
+  return await new Promise((resolve, reject) => {
+    db.run(sql, params, (err) => {
+      if (err) {
+        logger.error(`[DATABASE] Error updating category: ${err}`);
+        reject(err);
+      }
+      logger.debug(`[DATABASE] Updated category.`);
+      resolve(getCategory(category.id));
+    });
+  });
+}
+
+/**
+ * Delete a category.
+ * @param userId The user id.
+ * @param id The category id.
+ * @returns A promise that resolves when the category is deleted.
+ */
+export async function deleteCategory(
+  userId: string,
+  id: number,
+): Promise<Category> {
+  logger.debug(`[DATABASE] Deleting category [${id}].`);
+
+  const toReturn = getCategory(id);
+
+  const sql = `DELETE FROM categories WHERE id = ? AND user_id = ?`;
+  const params = [id, userId];
+
+  logger.debug(`[DATABASE] SQL: ${sql}, params: [${params}]`);
+
+  return await new Promise((resolve, reject) => {
+    db.run(sql, params, (err) => {
+      if (err) {
+        logger.error(`[DATABASE] Error deleting category: ${err}`);
+        reject(err);
+      }
+      logger.debug(`[DATABASE] Deleted category.`);
+      resolve(toReturn);
     });
   });
 }

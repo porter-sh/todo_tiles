@@ -1,37 +1,49 @@
 /// This file contains the definition of the [Category] type.
 
-import 'backend_translator.dart';
 import 'dropdown_menu_item.dart';
 
 /// Public class [Category] simply represents a category created by the user.
 /// It exists to make it easier to add new features in the future.
-class Category
-    implements FilterMenuItem<Category>, BackendTranslator<Category> {
+class Category implements FilterMenuItem<Category> {
   /// The id of the category.
-  final int? id;
+  int? id;
 
   /// The name of the category.
-  final String name;
+  String? name;
 
   /// The discription of the category.
-  final String? description;
+  String? description;
 
   /// The color of the category.
-  final String? color;
+  String? color;
 
   /// Constructor for the [Category] class.
   Category({
     this.id,
-    required this.name,
+    this.name,
     this.description,
     this.color,
   });
 
+  /// Copy constructor for the [Category] class.
+  Category.from(Category? category) {
+    if (category == null) {
+      return;
+    }
+
+    id = category.id;
+    name = category.name;
+    description = category.description;
+    color = category.color;
+  }
+
   /// Category that represents all categories.
-  static final all = Category(name: 'All', description: 'All categories');
+  static final all =
+      Category(id: -2, name: 'All', description: 'All categories');
 
   /// Category that represents no categories.
-  static final none = Category(name: 'None', description: 'No category');
+  static final none =
+      Category(id: -1, name: 'None', description: 'No category');
 
   /// Constructor for the [Category] class from a JSON object.
   factory Category.fromJson(Map<String, dynamic>? json) {
@@ -51,13 +63,10 @@ class Category
         'id': id,
         'name': name,
         'description': description,
-        'color': color,
+        'display_color': color,
       };
 
   /// Used for showing the category in a dropdown menu.
   @override
-  String get value => name;
-
-  @override
-  String get backendRepresentation => name;
+  String get value => name ?? '';
 }
